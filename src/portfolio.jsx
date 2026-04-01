@@ -119,11 +119,40 @@ function FadeIn({ children, delay = 0, className = "" }) {
 export default function Portfolio() {
   const [openProject, setOpenProject] = useState(null);
   const [navVisible, setNavVisible] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: ""
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setNavVisible(true), 300);
     return () => clearTimeout(t);
   }, []);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    // Simulate sending message (you can replace this with actual API call)
+    setTimeout(() => {
+      console.log("Message sent:", formData);
+      setIsSubmitting(false);
+      setShowModal(false);
+      // Reset form
+      setFormData({ name: "", email: "", message: "" });
+    }, 1000);
+  };
 
   return (
     <div style={{ fontFamily: "'Cormorant Garamond', serif", background: "#0E0E0E", color: "#F0EAD6", overflowX: "hidden" }}>
@@ -181,7 +210,179 @@ export default function Portfolio() {
         @keyframes fadeDown { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideDown { 0%{top:-30px} 100%{top:50px} }
+        @keyframes modalFadeIn {
+          from { opacity: 0; transform: scale(0.95); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        .modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.8);
+          backdrop-filter: blur(8px);
+          z-index: 1000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          animation: modalFadeIn 0.3s ease;
+        }
+        .modal-content {
+          background: #141414;
+          border: 1px solid rgba(255, 107, 0, 0.3);
+          border-radius: 12px;
+          padding: 2.5rem;
+          max-width: 500px;
+          width: 90%;
+          position: relative;
+        }
+        .form-input {
+          font-family: 'Outfit', sans-serif;
+          width: 100%;
+          padding: 12px 16px;
+          background: #0A0A0A;
+          border: 1px solid rgba(240,234,214,0.2);
+          border-radius: 4px;
+          color: #F0EAD6;
+          font-size: 14px;
+          transition: all 0.2s ease;
+        }
+        .form-input:focus {
+          outline: none;
+          border-color: #ff6b00;
+        }
+        .form-input::placeholder {
+          color: rgba(240,234,214,0.3);
+        }
+        textarea.form-input {
+          resize: vertical;
+          min-height: 100px;
+        }
       `}</style>
+
+      {/* MODAL */}
+      {showModal && (
+        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setShowModal(false)}
+              style={{
+                position: "absolute",
+                top: "20px",
+                right: "20px",
+                background: "none",
+                border: "none",
+                color: "rgba(240,234,214,0.5)",
+                fontSize: "20px",
+                cursor: "pointer",
+                fontFamily: "'Outfit', sans-serif",
+                transition: "color 0.2s"
+              }}
+              onMouseEnter={(e) => e.target.style.color = "#ff6b00"}
+              onMouseLeave={(e) => e.target.style.color = "rgba(240,234,214,0.5)"}
+            >
+              ✕
+            </button>
+            
+            <h3 style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: "28px",
+              fontWeight: 600,
+              marginBottom: "8px",
+              color: "#ff6b00"
+            }}>
+              Send a Message
+            </h3>
+            <p className="sans" style={{
+              fontSize: "13px",
+              color: "rgba(240,234,214,0.5)",
+              marginBottom: "24px"
+            }}>
+              I'll get back to you as soon as possible.
+            </p>
+            
+            <form onSubmit={handleSubmit}>
+              <div style={{ marginBottom: "20px" }}>
+                <label className="sans" style={{
+                  fontSize: "12px",
+                  color: "rgba(240,234,214,0.7)",
+                  marginBottom: "8px",
+                  display: "block",
+                  letterSpacing: "0.05em"
+                }}>
+                  YOUR NAME
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  placeholder="John Doe"
+                  className="form-input"
+                  required
+                />
+              </div>
+              
+              <div style={{ marginBottom: "20px" }}>
+                <label className="sans" style={{
+                  fontSize: "12px",
+                  color: "rgba(240,234,214,0.7)",
+                  marginBottom: "8px",
+                  display: "block",
+                  letterSpacing: "0.05em"
+                }}>
+                  EMAIL ADDRESS
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder="john@example.com"
+                  className="form-input"
+                  required
+                />
+              </div>
+              
+              <div style={{ marginBottom: "24px" }}>
+                <label className="sans" style={{
+                  fontSize: "12px",
+                  color: "rgba(240,234,214,0.7)",
+                  marginBottom: "8px",
+                  display: "block",
+                  letterSpacing: "0.05em"
+                }}>
+                  MESSAGE
+                </label>
+                <textarea
+                  name="message"
+                  value={formData.message}
+                  onChange={handleInputChange}
+                  placeholder="Your message here..."
+                  className="form-input"
+                  required
+                />
+              </div>
+              
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="cta-btn"
+                style={{
+                  width: "100%",
+                  padding: "14px",
+                  fontSize: "12px",
+                  background: isSubmitting ? "rgba(255,107,0,0.5)" : "transparent",
+                  cursor: isSubmitting ? "not-allowed" : "pointer"
+                }}
+              >
+                {isSubmitting ? "SENDING..." : "SEND MESSAGE →"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* NAV */}
       <nav style={{
@@ -451,7 +652,9 @@ export default function Portfolio() {
                   +91 97474 93273
                 </span>
               </div>
-              <a href="mailto:wafathima15@gmail.com" className="cta-btn" style={{ alignSelf: "flex-start" }}>Send a Message →</a>
+              <button onClick={() => setShowModal(true)} className="cta-btn" style={{ alignSelf: "flex-start" }}>
+                Send a Message →
+              </button>
             </div>
           </FadeIn>
         </div>
