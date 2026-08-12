@@ -1,5 +1,5 @@
-import { useState, useEffect, } from "react";
-import { motion, useAnimation, useInView } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 
 import havenix from "./assets/images/havenix.png";
 import lio from "./assets/images/lio.png";
@@ -7,61 +7,59 @@ import playora from "./assets/images/playora.png";
 import notepad from "./assets/images/notepad.png";
 import todo from "./assets/images/todo.png";
 
-// Modern Dark Theme with Purple Accents
+/* ============================================================
+   DESIGN TOKENS — editorial / creative-studio system
+   ============================================================ */
 const theme = {
-  background: "#09090B",
-  secondaryBg: "#111827",
-  cardBg: "rgba(17, 24, 39, 0.6)",
-  glassBg: "rgba(255, 255, 255, 0.03)",
-  primary: "#7C5CFF",
-  primaryLight: "#8B5CF6",
-  primaryGlow: "rgba(124, 92, 255, 0.3)",
-  primaryGlowStrong: "rgba(124, 92, 255, 0.5)",
-  textPrimary: "#FFFFFF",
-  textSecondary: "#A1A1AA",
-  textMuted: "#6B7280",
-  borderLight: "rgba(255, 255, 255, 0.06)",
-  borderMedium: "rgba(255, 255, 255, 0.1)",
-  success: "#34D399",
+  cream: "#F1EDE3",
+  creamDeep: "#E8E0CE",
+  red: "#A3211C",
+  redDeep: "#7A1712",
+  black: "#131110",
+  charcoal: "#2A2624",
+  gray: "#7A756C",
+  grayLight: "#B9B3A6",
+  white: "#FFFDF9",
+  line: "rgba(19, 17, 16, 0.12)",
+  lineOnDark: "rgba(241, 237, 227, 0.16)",
 };
 
 const skills = {
   frontend: ["TypeScript", "Next.js", "React.js", "Redux", "JavaScript", "HTML", "CSS", "Tailwind CSS", "Responsive Design", "UI/UX Principles", "Axios", "React Router"],
   backend: ["Node.js", "Express.js", "MongoDB", "REST APIs", "JWT Auth", "Mongoose", "Data Design", "Server-side Logic", "Performance Optimization"],
-  tools: ["Git & GitHub", "Postman", "Vercel", "Figma", "VS Code", "Prettier"],
+  tools: ["Git & GitHub", "Postman", "Vercel", "Figma", "VS Code", "Docker"],
 };
 
 const education = [
-  { year: "2026 – present", degree: "Internship — MERN Stack Developer", school: "Zaitoon International Campus" },
-  { year: "2025 – 2026", degree: "Diploma in Full Stack Web Development", school: "Zaitoon International Girls Campus" },
-  { year: "2023 – 2025", degree: "Higher Secondary Studies", school: "Nafeesathul Misriya Institute of Innovation" },
+  { year: "2026 — present", degree: "Internship — MERN Stack Developer", school: "Zaitoon International Campus" },
+  { year: "2025 — 2026", degree: "Diploma in Full Stack Web Development", school: "Zaitoon International Girls Campus" },
+  { year: "2023 — 2025", degree: "Higher Secondary Studies", school: "Nafeesathul Misriya Institute of Innovation" },
 ];
 
 const projects = [
   {
     num: "01",
-    title: "Playora",
-    category: "E-Commerce Platform",
-    year: "2026",
-    image: playora,
-    desc: "A full-stack e-commerce application built on the MERN stack with JWT auth, Redux state management, product catalogue, cart system, and fully responsive UI.",
-    details: ["RESTful APIs with Node.js & Express", "JWT authentication & authorization", "MongoDB schemas via Mongoose", "Responsive React.js frontend", "Axios-powered API integration", "Cart & order management system"],
-    tags: ["MERN", "E-Commerce", "JWT", "Redux", "Tailwind", "Axios"],
-    liveLink: "https://playoratoy.vercel.app/",
-    repoLink: "https://github.com/wafathima/playoratoystore",
-  },
-  {
-    num: "02",
     title: "Havenix",
     category: "Real Estate Platform",
     year: "2026",
     image: havenix,
     desc: "A full-stack property platform for buying and selling real estate. Built with advanced search, full CRUD functionality, and a clean performant user interface.",
-    details: ["REST APIs for listings & users", "Secure login/signup system", "MongoDB property database", "Responsive React.js UI", "Full CRUD operations", "Performance-optimized architecture"],
     tags: ["MERN", "Real Estate", "CRUD", "Tailwind", "Axios"],
-    liveLink: "https://havenixfront.vercel.app/",
+    liveLink: "https://havenix-copy-frontend-ogc3.onrender.com/",
     repoLink: "https://github.com/wafathima/Havenix",
   },
+  {
+    num: "02",
+    title: "Playora",
+    category: "E-Commerce Platform",
+    year: "2026",
+    image: playora,
+    desc: "A full-stack e-commerce application built on the MERN stack with JWT auth, Redux state management, product catalogue, cart system, and fully responsive UI.",
+    tags: ["MERN", "E-Commerce", "JWT", "Redux", "Tailwind", "Axios"],
+    liveLink: "https://playoratoy.vercel.app/",
+    repoLink: "https://github.com/wafathima/playoratoystore",
+  },
+  
   {
     num: "03",
     title: "Lio Store",
@@ -69,7 +67,6 @@ const projects = [
     year: "2025",
     image: lio,
     desc: "A responsive frontend for a shoe e-commerce brand with product filtering, cart functionality, and polished UI/UX focusing on mobile responsiveness.",
-    details: ["React.js component architecture", "Product filtering & cart system", "Mock API integration", "UI/UX improvements & polish", "Full mobile responsiveness"],
     tags: ["React", "Frontend", "UI/UX", "Tailwind"],
     liveLink: "https://liostorecom.vercel.app/",
     repoLink: "https://github.com/wafathima/liostorecom",
@@ -81,7 +78,6 @@ const miniProjects = [
     title: "NotePad App",
     image: notepad,
     description: "A modern note-taking application built with Next.js and TypeScript that allows users to create, edit, organize, and delete notes with a clean and responsive interface.",
-    features: ["Create, edit, and delete notes", "Organized note management", "Responsive design", "Fast page rendering with Next.js", "Type-safe development using TypeScript", "Clean and modern UI"],
     stack: ["Next.js", "TypeScript", "React", "Tailwind CSS"],
     repoLink: "https://github.com/wafathima/Notepad",
     liveLink: "https://notepadminiapp.vercel.app/",
@@ -90,285 +86,234 @@ const miniProjects = [
     title: "Todo App",
     image: todo,
     description: "A responsive task management application developed using React.js and TypeScript. The app helps users efficiently manage daily tasks by adding, updating, completing, and deleting todos.",
-    features: ["Add new tasks", "Edit existing tasks", "Mark tasks as completed", "Delete tasks", "Responsive interface", "Instant UI updates"],
     stack: ["React.js", "TypeScript", "Tailwind CSS"],
     repoLink: "https://github.com/wafathima/TypescriptProject",
     liveLink: "https://todo-frontend-w23l.onrender.com/",
   },
 ];
 
-const languages = [{ name: "English", level: "Intermediate", pct: 60 }, { name: "Malayalam", level: "Fluent", pct: 100 }];
+const languages = [{ name: "English", level: "Intermediate" }, { name: "Malayalam", level: "Fluent" }];
 const hobbies = ["Learning New Technologies", "Coding Practice & Problem Solving", "UI/UX Exploration", "Building Side Projects", "Tech Content & Research"];
 
-// Animation variants
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+const NAV_ITEMS = [
+  { id: "work", label: "Work" },
+  { id: "about", label: "About" },
+  { id: "expertise", label: "Expertise" },
+  { id: "experience", label: "Experience" },
+  { id: "contact", label: "Contact" },
+];
+
+/* ============================================================
+   MOTION HELPERS
+   ============================================================ */
+const revealUp = {
+  hidden: { opacity: 0, y: 48 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: [0.16, 1, 0.3, 1] } },
+};
+
+const clipReveal = {
+  hidden: { clipPath: "inset(0 0 100% 0)" },
+  visible: { clipPath: "inset(0 0 0% 0)", transition: { duration: 1.1, ease: [0.76, 0, 0.24, 1] } },
 };
 
 const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2,
-    }
-  }
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.06, delayChildren: 0.1 } },
 };
 
-const floatAnimation = {
-  y: [0, -10, 0],
-  transition: {
-    duration: 3,
-    repeat: Infinity,
-    ease: "easeInOut"
-  }
+const letterUp = {
+  hidden: { opacity: 0, y: "100%" },
+  visible: { opacity: 1, y: "0%", transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } },
 };
 
-// Components
-const GlassCard = ({ children, className = "" }) => (
-  <div className={`glass-card ${className}`} style={{
-    background: theme.glassBg,
-    backdropFilter: "blur(20px)",
-    border: `1px solid ${theme.borderLight}`,
-    borderRadius: "24px",
-    padding: "2rem",
-    transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
-  }}>
-    {children}
-  </div>
-);
-
-const SectionHeading = ({ eyebrow, title, highlight, description }) => (
-  <motion.div
-    initial="hidden"
-    whileInView="visible"
-    viewport={{ once: true }}
-    variants={fadeUp}
-    style={{ marginBottom: "3rem" }}
-  >
-    <p style={{
-      fontFamily: "'Outfit', sans-serif",
-      fontSize: "14px",
-      fontWeight: 600,
-      color: theme.primary,
-      letterSpacing: "0.15em",
-      textTransform: "uppercase",
-      marginBottom: "0.75rem",
-    }}>{eyebrow}</p>
-    <h2 style={{
-      fontFamily: "'Space Grotesk', sans-serif",
-      fontSize: "clamp(2.2rem, 4vw, 3.5rem)",
-      fontWeight: 700,
-      color: theme.textPrimary,
-      letterSpacing: "-0.02em",
-      lineHeight: 1.1,
-    }}>
-      {title} <span style={{ color: theme.primary }}>{highlight}</span>
-    </h2>
-    {description && (
-      <p style={{
-        fontFamily: "'Outfit', sans-serif",
-        fontSize: "16px",
-        color: theme.textSecondary,
-        maxWidth: "560px",
-        marginTop: "1rem",
-        lineHeight: 1.7,
-      }}>{description}</p>
-    )}
-  </motion.div>
-);
-
-const Button = ({ children, variant = "primary", className = "", ...props }) => {
-  const styles = {
-    primary: {
-      background: `linear-gradient(135deg, ${theme.primary}, ${theme.primaryLight})`,
-      color: "#FFFFFF",
-      boxShadow: `0 4px 20px ${theme.primaryGlow}`,
-    },
-    secondary: {
-      background: "transparent",
-      color: theme.textPrimary,
-      border: `1px solid ${theme.borderMedium}`,
-    }
-  };
-
+/** Splits a heading into words that reveal upward in a staggered sequence. */
+function RevealHeading({ text, as: Tag = "h2", style, delay = 0 }) {
+  const words = text.split(" ");
   return (
-    <motion.button
-      whileHover={{ scale: 1.03, y: -2 }}
-      whileTap={{ scale: 0.97 }}
-      style={{
-        fontFamily: "'Outfit', sans-serif",
-        fontSize: "14px",
-        fontWeight: 600,
-        padding: "14px 32px",
-        borderRadius: "12px",
-        border: "none",
-        cursor: "pointer",
-        transition: "all 0.3s ease",
-        ...styles[variant],
-      }}
-      className={className}
-      {...props}
-    >
-      {children}
-    </motion.button>
-  );
-};
-
-const SkillCard = ({ category, items }) => {
-  return (
-    <motion.div
-      whileHover={{ y: -6 }}
-      style={{
-        background: theme.glassBg,
-        backdropFilter: "blur(16px)",
-        border: `1px solid ${theme.borderLight}`,
-        borderRadius: "20px",
-        padding: "1.5rem",
-        transition: "all 0.4s ease",
-      }}
-    >
-      <h3 style={{
-        fontFamily: "'Space Grotesk', sans-serif",
-        fontSize: "18px",
-        fontWeight: 600,
-        color: theme.textPrimary,
-        marginBottom: "1rem",
-      }}>{category}</h3>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-        {items.map((skill, i) => (
-          <motion.span
-            key={skill}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: i * 0.03 }}
-            style={{
-              fontFamily: "'Outfit', sans-serif",
-              fontSize: "12px",
-              fontWeight: 500,
-              padding: "6px 14px",
-              borderRadius: "100px",
-              background: "rgba(124, 92, 255, 0.1)",
-              color: theme.textSecondary,
-              border: `1px solid ${theme.borderLight}`,
-              transition: "all 0.3s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.background = theme.primary;
-              e.target.style.color = "#FFFFFF";
-              e.target.style.transform = "scale(1.05)";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.background = "rgba(124, 92, 255, 0.1)";
-              e.target.style.color = theme.textSecondary;
-              e.target.style.transform = "scale(1)";
-            }}
-          >
-            {skill}
-          </motion.span>
+    <Tag style={{ ...style, overflow: "hidden" }}>
+      <motion.span
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-10%" }}
+        variants={{ visible: { transition: { staggerChildren: 0.045, delayChildren: delay } } }}
+        style={{ display: "inline-block" }}
+      >
+        {words.map((w, i) => (
+          <span key={i} style={{ display: "inline-block", overflow: "hidden", marginRight: "0.28em" }}>
+            <motion.span variants={letterUp} style={{ display: "inline-block" }}>{w}</motion.span>
+          </span>
         ))}
-      </div>
-    </motion.div>
+      </motion.span>
+    </Tag>
   );
-};
+}
 
-function MiniProjectCard({ project, index }) {
-  const [expanded, setExpanded] = useState(false);
+/** Small uppercase numbered eyebrow label used to mark each editorial section. */
+function SectionMark({ index, label, dark }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1, duration: 0.5 }}
+      initial={{ opacity: 0, x: -16 }}
+      whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true }}
-      whileHover={{ y: -8 }}
-      style={{
-        background: theme.glassBg,
-        backdropFilter: "blur(16px)",
-        border: `1px solid ${theme.borderLight}`,
-        borderRadius: "20px",
-        overflow: "hidden",
-        transition: "all 0.4s ease",
-      }}
+      transition={{ duration: 0.6 }}
+      style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "2.5rem" }}
     >
-      <div style={{ height: "200px", overflow: "hidden", position: "relative" }}>
-        <img src={project.image} alt={project.title} style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          transition: "transform 0.6s ease",
-        }} />
-        <div style={{
-          position: "absolute",
-          top: "12px",
-          right: "12px",
-          background: `linear-gradient(135deg, ${theme.primary}, ${theme.primaryLight})`,
-          padding: "4px 14px",
-          borderRadius: "100px",
-          fontSize: "11px",
-          fontWeight: 600,
-          color: "#FFFFFF",
-          fontFamily: "'Outfit', sans-serif",
-        }}>
-          {project.stack.slice(0, 2).join(" · ")}
-        </div>
-      </div>
-      <div style={{ padding: "1.5rem" }}>
-        <h3 style={{
-          fontFamily: "'Space Grotesk', sans-serif",
-          fontSize: "20px",
-          fontWeight: 600,
-          color: theme.textPrimary,
-          marginBottom: "8px",
-        }}>{project.title}</h3>
-        <p style={{
-          fontFamily: "'Outfit', sans-serif",
-          fontSize: "14px",
-          color: theme.textSecondary,
-          lineHeight: 1.6,
-          marginBottom: "1rem",
-        }}>{project.description}</p>
-        <div style={{ display: "flex", gap: "10px" }}>
-          <a href={project.repoLink} target="_blank" rel="noopener noreferrer">
-            <Button variant="secondary" style={{ padding: "8px 18px", fontSize: "12px" }}>Code ↗</Button>
-          </a>
-          {project.liveLink && (
-            <a href={project.liveLink} target="_blank" rel="noopener noreferrer">
-              <Button variant="primary" style={{ padding: "8px 18px", fontSize: "12px" }}>Live Demo ↗</Button>
-            </a>
-          )}
-        </div>
-      </div>
+      <span style={{
+        fontFamily: "'JetBrains Mono', monospace",
+        fontSize: "13px",
+        color: dark ? theme.cream : theme.red,
+        letterSpacing: "0.02em",
+      }}>{index}</span>
+      <span style={{ width: "36px", height: "1px", background: dark ? theme.lineOnDark : theme.line }} />
+      <span style={{
+        fontFamily: "'Inter', sans-serif",
+        fontSize: "12px",
+        fontWeight: 600,
+        letterSpacing: "0.22em",
+        textTransform: "uppercase",
+        color: dark ? theme.grayLight : theme.gray,
+      }}>{label}</span>
     </motion.div>
   );
 }
 
+/** Button with a light magnetic pull toward the cursor + arrow micro-interaction. */
+function MagButton({ children, href, onClick, variant = "dark", style, type }) {
+  const ref = useRef(null);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+
+  const handleMove = (e) => {
+    const el = ref.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const x = (e.clientX - r.left - r.width / 2) * 0.3;
+    const y = (e.clientY - r.top - r.height / 2) * 0.3;
+    setPos({ x, y });
+  };
+  const reset = () => setPos({ x: 0, y: 0 });
+
+  const variants = {
+    dark: { background: theme.black, color: theme.cream, border: `1px solid ${theme.black}` },
+    red: { background: theme.red, color: theme.white, border: `1px solid ${theme.red}` },
+    outline: { background: "transparent", color: theme.black, border: `1px solid ${theme.black}` },
+    outlineLight: { background: "transparent", color: theme.cream, border: `1px solid ${theme.lineOnDark}` },
+  };
+
+  const Comp = href ? motion.a : motion.button;
+  return (
+    <Comp
+      ref={ref}
+      href={href}
+      target={href ? "_blank" : undefined}
+      rel={href ? "noopener noreferrer" : undefined}
+      onClick={onClick}
+      type={type}
+      onMouseMove={handleMove}
+      onMouseLeave={reset}
+      animate={{ x: pos.x, y: pos.y }}
+      transition={{ type: "spring", stiffness: 150, damping: 12, mass: 0.4 }}
+      style={{
+        fontFamily: "'Inter', sans-serif",
+        fontSize: "13px",
+        fontWeight: 600,
+        letterSpacing: "0.04em",
+        padding: "15px 30px",
+        borderRadius: "100px",
+        cursor: "pointer",
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "10px",
+        textTransform: "uppercase",
+        ...variants[variant],
+        ...style,
+      }}
+    >
+      {children}
+    </Comp>
+  );
+}
+
+const Arrow = ({ rotate = -45 }) => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
+    style={{ transform: `rotate(${rotate}deg)` }}>
+    <line x1="5" y1="19" x2="19" y2="5" /><polyline points="7 5 19 5 19 17" />
+  </svg>
+);
+
+/* ============================================================
+   PROJECT IMAGE — duotone-on-load, full colour on hover
+   ============================================================ */
+
+function EditorialImage({ src, alt, radius = "2px" }) {
+  const [hover, setHover] = useState(false);
+  return (
+    <div
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{ 
+        position: "relative", 
+        overflow: "hidden", 
+        borderRadius: radius, 
+        background: theme.charcoal,
+        // Remove fixed aspect ratio
+      }}
+    >
+      <motion.img
+        src={src}
+        alt={alt}
+        initial={{ scale: 1.12 }}
+        whileInView={{ scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
+        animate={{ scale: hover ? 1.05 : 1 }}
+        style={{
+          width: "100%",
+          height: "auto", // Change from 100% to auto
+          objectFit: "contain", // Change from cover to contain
+          display: "block",
+          filter: hover ? "grayscale(0) contrast(1)" : "grayscale(0.85) contrast(1.05)",
+          transition: "filter 0.6s ease, transform 0.6s ease",
+        }}
+      />
+      <div style={{
+        position: "absolute",
+        inset: 0,
+        background: theme.red,
+        mixBlendMode: "multiply",
+        opacity: hover ? 0 : 0.28,
+        transition: "opacity 0.6s ease",
+        pointerEvents: "none",
+      }} />
+    </div>
+  );
+}
+  
+/* ============================================================
+   MAIN COMPONENT
+   ============================================================ */
 export default function Portfolio() {
-  const [navVisible, setNavVisible] = useState(false);
+  const [navSolid, setNavSolid] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
-  const [activeSection, setActiveSection] = useState("top");
-  const [scrollY, setScrollY] = useState(0);
+
+  const heroRef = useRef(null);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const heroY = useTransform(scrollYProgress, [0, 1], [0, 120]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   useEffect(() => {
-    setTimeout(() => setNavVisible(true), 150);
-    
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-      const sections = ["top", "about", "skills", "projects", "mini", "experience", "contact"];
-      const scrollPos = window.scrollY + 200;
-      for (const section of sections) {
-        const el = document.getElementById(section);
-        if (el && el.offsetTop <= scrollPos) {
-          setActiveSection(section);
-        }
-      }
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => setNavSolid(window.scrollY > 60);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const scrollToSection = (id) => {
+    setMenuOpen(false);
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -380,1018 +325,609 @@ export default function Portfolio() {
     }, 900);
   };
 
-  const scrollToSection = (id) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth" });
-  };
-
   return (
     <div style={{
-      fontFamily: "'Outfit', sans-serif",
-      background: theme.background,
-      color: theme.textPrimary,
+      fontFamily: "'Inter', sans-serif",
+      background: theme.cream,
+      color: theme.black,
       overflowX: "hidden",
-      minHeight: "100vh",
       position: "relative",
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
-        
+        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
-        ::selection { background: ${theme.primary}; color: #FFFFFF; }
+        ::selection { background: ${theme.red}; color: ${theme.white}; }
         a { text-decoration: none; color: inherit; }
-        
-        .gradient-bg {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          pointer-events: none;
-          z-index: 0;
-          background: 
-            radial-gradient(ellipse at 20% 50%, rgba(124, 92, 255, 0.08) 0%, transparent 60%),
-            radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.05) 0%, transparent 50%),
-            radial-gradient(ellipse at 50% 100%, rgba(124, 92, 255, 0.06) 0%, transparent 50%);
+        button { font: inherit; }
+        input, textarea { font-family: 'Inter', sans-serif; }
+
+        @media (prefers-reduced-motion: reduce) {
+          *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
         }
-        
-        .noise {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          pointer-events: none;
-          z-index: 0;
-          opacity: 0.02;
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-          background-repeat: repeat;
-          background-size: 256px 256px;
+
+        .grain {
+          position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.035; mix-blend-mode: multiply;
+          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+          background-size: 220px 220px;
         }
-        
-        .glass-nav {
-          background: rgba(9, 9, 11, 0.85);
-          backdrop-filter: blur(20px);
-          border-bottom: 1px solid ${theme.borderLight};
+
+        .marquee-track { display: flex; width: max-content; animation: marquee 26s linear infinite; }
+        @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+        .hover-line { position: relative; }
+        .hover-line::after {
+          content: ""; position: absolute; left: 0; bottom: -3px; width: 100%; height: 1px;
+          background: currentColor; transform: scaleX(0); transform-origin: right; transition: transform 0.35s ease;
         }
-        
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-        }
-        
-        .floating {
-          animation: float 3s ease-in-out infinite;
-        }
-        
-        .floating-delay {
-          animation: float 4s ease-in-out infinite 1s;
-        }
-        
-        @keyframes glow {
-          0%, 100% { opacity: 0.3; }
-          50% { opacity: 0.6; }
-        }
-        
-        .glow-pulse {
-          animation: glow 3s ease-in-out infinite;
-        }
-        
+        .hover-line:hover::after { transform: scaleX(1); transform-origin: left; }
+
+        .nav-link { position: relative; padding: 4px 0; }
+
         @media (max-width: 968px) {
-          .hero-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
-          .contact-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
-          .project-row { grid-template-columns: 1fr !important; gap: 32px !important; }
-          .project-row.rev { direction: ltr !important; }
-          .nav-links { display: none !important; }
-          .skills-grid { grid-template-columns: 1fr 1fr !important; }
+          .split-grid { grid-template-columns: 1fr !important; }
+          .nav-links-desktop { display: none !important; }
+          .expertise-grid { grid-template-columns: 1fr !important; }
+          .mini-grid { grid-template-columns: 1fr !important; }
+          .project-row { grid-template-columns: 1fr !important; }
+          .project-row .proj-text { order: 2 !important; }
+          .project-row .proj-img { order: 1 !important; }
+          .stat-row { grid-template-columns: 1fr 1fr !important; }
         }
-        
         @media (max-width: 640px) {
-          .skills-grid { grid-template-columns: 1fr !important; }
-          .project-row { gap: 24px !important; }
-          .section-title { font-size: clamp(1.8rem, 6vw, 2.4rem) !important; }
+          .hero-h1 { font-size: 15vw !important; }
         }
       `}</style>
 
-      <div className="gradient-bg" />
-      <div className="noise" />
+      <div className="grain" />
 
       {/* ── NAVBAR ── */}
-      <nav className={`glass-nav ${navVisible ? "" : "opacity-0"}`} style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 100,
-        padding: "16px 48px",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        transition: "opacity 0.6s ease, transform 0.6s ease",
-        opacity: navVisible ? 1 : 0,
-        transform: navVisible ? "translateY(0)" : "translateY(-20px)",
-      }}>
-        <a href="#top" style={{
-          fontFamily: "'Space Grotesk', sans-serif",
-          fontSize: "22px",
-          fontWeight: 700,
-          color: theme.textPrimary,
-          letterSpacing: "-0.02em",
+      <motion.nav
+        initial={{ y: -80 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        style={{
+          position: "fixed", top: 0, left: 0, right: 0, zIndex: 200,
+          padding: navSolid ? "16px 40px" : "26px 40px",
+          display: "flex", justifyContent: "space-between", alignItems: "center",
+          background: navSolid ? theme.cream : "transparent",
+          borderBottom: navSolid ? `1px solid ${theme.line}` : "1px solid transparent",
+          transition: "padding 0.35s ease, background 0.35s ease, border-color 0.35s ease",
+        }}
+      >
+        <a href="#top" onClick={(e) => { e.preventDefault(); scrollToSection("top"); }} style={{
+          fontFamily: "'Syne', sans-serif", fontSize: "20px", fontWeight: 800, letterSpacing: "-0.01em",
         }}>
-          WF<span style={{ color: theme.primary }}>.</span>
+          W<span style={{ color: theme.red }}>F.</span>
         </a>
-        <div className="nav-links" style={{ display: "flex", gap: "32px", alignItems: "center" }}>
-          {[
-            { id: "top", label: "Home" },
-            { id: "about", label: "About" },
-            { id: "skills", label: "Skills" },
-            { id: "projects", label: "Projects" },
-            { id: "experience", label: "Experience" },
-            { id: "contact", label: "Contact" }
-          ].map(item => (
-            <a
-              key={item.id}
-              href={`#${item.id}`}
+
+        <div className="nav-links-desktop" style={{ display: "flex", alignItems: "center", gap: "38px" }}>
+          {NAV_ITEMS.map((item) => (
+            <a key={item.id} href={`#${item.id}`} className="nav-link hover-line"
               onClick={(e) => { e.preventDefault(); scrollToSection(item.id); }}
-              style={{
-                fontFamily: "'Outfit', sans-serif",
-                fontSize: "14px",
-                fontWeight: 500,
-                color: activeSection === item.id ? theme.primary : theme.textSecondary,
-                transition: "color 0.3s ease",
-                position: "relative",
-              }}
-              onMouseEnter={(e) => e.target.style.color = theme.primary}
-              onMouseLeave={(e) => {
-                if (activeSection !== item.id) e.target.style.color = theme.textSecondary;
-              }}
+              style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.03em", textTransform: "uppercase" }}
             >
               {item.label}
-              {activeSection === item.id && (
-                <span style={{
-                  position: "absolute",
-                  bottom: "-4px",
-                  left: 0,
-                  right: 0,
-                  height: "2px",
-                  background: theme.primary,
-                  borderRadius: "1px",
-                }} />
-              )}
             </a>
           ))}
-          <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-            <a href="https://github.com/wafathima" target="_blank" rel="noopener noreferrer" style={{
-              width: "40px",
-              height: "40px",
-              borderRadius: "50%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "rgba(255,255,255,0.05)",
-              border: `1px solid ${theme.borderLight}`,
-              transition: "all 0.3s ease",
-              color: theme.textSecondary,
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.background = theme.primary;
-              e.target.style.color = "#FFFFFF";
-              e.target.style.borderColor = theme.primary;
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.background = "rgba(255,255,255,0.05)";
-              e.target.style.color = theme.textSecondary;
-              e.target.style.borderColor = theme.borderLight;
-            }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.15 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.62.24 2.85.12 3.15.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
-            </a>
-            <a href="https://linkedin.com/in/wafa-fathima-1538wf" target="_blank" rel="noopener noreferrer" style={{
-              width: "40px",
-              height: "40px",
-              borderRadius: "50%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "rgba(255,255,255,0.05)",
-              border: `1px solid ${theme.borderLight}`,
-              transition: "all 0.3s ease",
-              color: theme.textSecondary,
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.background = theme.primary;
-              e.target.style.color = "#FFFFFF";
-              e.target.style.borderColor = theme.primary;
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.background = "rgba(255,255,255,0.05)";
-              e.target.style.color = theme.textSecondary;
-              e.target.style.borderColor = theme.borderLight;
-            }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-            </a>
-            <a href="https://drive.google.com/file/d/1HXf1aXYJb8db-skFx7cGjyIGGbEJm3-y/view?usp=sharing" target="_blank" rel="noopener noreferrer">
-              <Button variant="secondary" style={{ padding: "10px 22px", fontSize: "13px" }}>Resume</Button>
-            </a>
-          </div>
+          <a href="https://drive.google.com/file/d/1HXf1aXYJb8db-skFx7cGjyIGGbEJm3-y/view?usp=sharing" target="_blank" rel="noopener noreferrer">
+            <MagButton variant="dark" style={{ padding: "10px 22px", fontSize: "12px" }}>Resume</MagButton>
+          </a>
         </div>
-      </nav>
 
-      {/* ── HERO ── */}
-      <section id="top" style={{
-        minHeight: "100vh",
-        padding: "140px 48px 80px",
-        maxWidth: "1200px",
-        margin: "0 auto",
-        position: "relative",
-        zIndex: 1,
-        display: "grid",
-        gridTemplateColumns: "1.1fr 0.9fr",
-        gap: "60px",
-        alignItems: "center",
-      }} className="hero-grid">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          style={{ position: "relative", zIndex: 2 }}
+        <button
+          onClick={() => setMenuOpen((v) => !v)}
+          style={{
+            display: "none", background: "none", border: "none", cursor: "pointer",
+            width: "34px", height: "22px", position: "relative", zIndex: 210,
+          }}
+          className="mobile-menu-btn"
         >
+          <span style={{ position: "absolute", top: menuOpen ? "10px" : "0", left: 0, width: "100%", height: "2px", background: theme.black, transform: menuOpen ? "rotate(45deg)" : "none", transition: "all 0.3s ease" }} />
+          <span style={{ position: "absolute", top: "10px", left: 0, width: "100%", height: "2px", background: theme.black, opacity: menuOpen ? 0 : 1, transition: "all 0.3s ease" }} />
+          <span style={{ position: "absolute", top: menuOpen ? "10px" : "20px", left: 0, width: "100%", height: "2px", background: theme.black, transform: menuOpen ? "rotate(-45deg)" : "none", transition: "all 0.3s ease" }} />
+        </button>
+      </motion.nav>
+
+      <style>{`
+        @media (max-width: 968px) {
+          .mobile-menu-btn { display: block !important; }
+        }
+      `}</style>
+
+      {/* Mobile menu overlay */}
+      <AnimatePresence>
+        {menuOpen && (
           <motion.div
-            animate={floatAnimation}
+            initial={{ clipPath: "circle(0% at 100% 0%)" }}
+            animate={{ clipPath: "circle(150% at 100% 0%)" }}
+            exit={{ clipPath: "circle(0% at 100% 0%)" }}
+            transition={{ duration: 0.6, ease: [0.76, 0, 0.24, 1] }}
             style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "10px",
-              background: theme.glassBg,
-              backdropFilter: "blur(12px)",
-              border: `1px solid ${theme.borderLight}`,
-              borderRadius: "100px",
-              padding: "8px 20px",
-              marginBottom: "1.5rem",
+              position: "fixed", inset: 0, zIndex: 190, background: theme.black,
+              display: "flex", flexDirection: "column", justifyContent: "center", gap: "1.6rem", padding: "0 40px",
             }}
           >
-            <span style={{
-              width: "8px",
-              height: "8px",
-              borderRadius: "50%",
-              background: theme.success,
-              display: "inline-block",
-            }} />
-            <span style={{
-              fontFamily: "'Outfit', sans-serif",
-              fontSize: "13px",
-              fontWeight: 500,
-              color: theme.textSecondary,
-            }}>Available for hire</span>
+            {NAV_ITEMS.map((item, i) => (
+              <motion.a
+                key={item.id}
+                href={`#${item.id}`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 + i * 0.06 }}
+                onClick={(e) => { e.preventDefault(); scrollToSection(item.id); }}
+                style={{ fontFamily: "'Syne', sans-serif", fontSize: "13vw", fontWeight: 700, color: theme.cream, lineHeight: 1.1 }}
+              >
+                {item.label}
+              </motion.a>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── HERO ── */}
+      <section id="top" ref={heroRef} style={{
+        minHeight: "100vh", padding: "160px 40px 60px", maxWidth: "1400px", margin: "0 auto",
+        position: "relative", display: "flex", flexDirection: "column", justifyContent: "space-between", zIndex: 1,
+      }}>
+        <motion.div style={{ y: heroY, opacity: heroOpacity }}>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2, duration: 0.6 }}
+            style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "1.6rem" }}>
+            <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: theme.red, display: "inline-block" }} />
+            <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "12px", letterSpacing: "0.05em", color: theme.gray, textTransform: "uppercase" }}>
+              Available for hire — based in Kerala, India
+            </span>
           </motion.div>
 
-          <h1 style={{
-            fontFamily: "'Space Grotesk', sans-serif",
-            fontSize: "clamp(3.2rem, 6vw, 5.5rem)",
-            fontWeight: 700,
-            lineHeight: 1.05,
-            letterSpacing: "-0.03em",
-            marginBottom: "1.5rem",
-          }}>
-            Hi, I'm <br />
-            <span style={{ color: theme.primary }}>Wafa Fathima</span>
-          </h1>
-
-          <p style={{
-            fontFamily: "'Outfit', sans-serif",
-            fontSize: "18px",
-            color: theme.textSecondary,
-            maxWidth: "480px",
-            lineHeight: 1.8,
-            marginBottom: "2rem",
-          }}>
-            Full Stack <span style={{ color: theme.primary, fontWeight: 600 }}>MERN</span> Developer building responsive, scalable web applications with clean backends and pixel-perfect frontends.
-          </p>
-
-          <div style={{ display: "flex", gap: "14px", flexWrap: "wrap", marginBottom: "2rem" }}>
-            <Button onClick={() => scrollToSection("projects")}>View Projects →</Button>
-            <a href="https://drive.google.com/file/d/1HXf1aXYJb8db-skFx7cGjyIGGbEJm3-y/view?usp=sharing" target="_blank" rel="noopener noreferrer">
-              <Button variant="secondary">Download Resume</Button>
-            </a>
-          </div>
-
-          <div style={{ display: "flex", gap: "20px" }}>
-            <a href="https://github.com/wafathima" target="_blank" rel="noopener noreferrer" style={{
-              color: theme.textSecondary,
-              transition: "color 0.3s ease",
-              fontSize: "20px",
+          <RevealHeading
+            as="h1"
+            text="WAFA FATHIMA."
+            className="hero-h1"
+            style={{
+              fontFamily: "'Syne', sans-serif", fontWeight: 800, textTransform: "uppercase",
+              fontSize: "clamp(3rem, 9.5vw, 8.5rem)", lineHeight: 0.94, letterSpacing: "-0.02em", color: theme.black,
             }}
-            onMouseEnter={(e) => e.target.style.color = theme.primary}
-            onMouseLeave={(e) => e.target.style.color = theme.textSecondary}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.15 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.62.24 2.85.12 3.15.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
-            </a>
-            <a href="https://linkedin.com/in/wafa-fathima-1538wf" target="_blank" rel="noopener noreferrer" style={{
-              color: theme.textSecondary,
-              transition: "color 0.3s ease",
-              fontSize: "20px",
-            }}
-            onMouseEnter={(e) => e.target.style.color = theme.primary}
-            onMouseLeave={(e) => e.target.style.color = theme.textSecondary}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-            </a>
-            <a href="mailto:wafathima15@gmail.com" style={{
-              color: theme.textSecondary,
-              transition: "color 0.3s ease",
-              fontSize: "20px",
-            }}
-            onMouseEnter={(e) => e.target.style.color = theme.primary}
-            onMouseLeave={(e) => e.target.style.color = theme.textSecondary}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            </a>
+          />
+
+          <div style={{ display: "flex", alignItems: "flex-end", gap: "24px", flexWrap: "wrap", marginTop: "0.4rem" }}>
+            <RevealHeading
+              as="h2"
+              text="FULL STACK MERN DEVELOPER"
+              delay={0.15}
+              style={{
+                fontFamily: "'Syne', sans-serif", fontWeight: 700, textTransform: "uppercase",
+                fontSize: "clamp(1.6rem, 4.4vw, 3.4rem)", lineHeight: 1, letterSpacing: "-0.01em",
+                color: theme.white, background: theme.red, padding: "10px 22px", display: "inline-block",
+              }}
+            />
           </div>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          style={{
-            position: "relative",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+          initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer}
+          className="split-grid"
+          style={{ display: "grid", gridTemplateColumns: "1.1fr 0.9fr", gap: "60px", marginTop: "4rem", alignItems: "end" }}
         >
-          <div style={{
-            position: "relative",
-            width: "100%",
-            maxWidth: "480px",
-            aspectRatio: "1",
+          <motion.p variants={revealUp} style={{
+            fontFamily: "'Inter', sans-serif", fontSize: "clamp(15px, 1.6vw, 19px)", color: theme.charcoal,
+            lineHeight: 1.75, maxWidth: "560px",
           }}>
-            {/* Glow orb */}
-            <div style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              width: "80%",
-              height: "80%",
-              borderRadius: "50%",
-              background: `radial-gradient(circle, ${theme.primaryGlow}, transparent 70%)`,
-              filter: "blur(60px)",
-              animation: "glow 3s ease-in-out infinite",
-            }} />
+            I build responsive, scalable web applications with clean backends and pixel-perfect frontends —
+            turning product ideas into full-stack MERN experiences, end to end.
+          </motion.p>
 
-            {/* Glass card */}
-            <GlassCard style={{
-              position: "relative",
-              zIndex: 1,
-              padding: "2rem",
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              border: `1px solid ${theme.borderMedium}`,
-            }}>
-              <div style={{
-                fontSize: "72px",
-                marginBottom: "1rem",
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 700,
-                background: `linear-gradient(135deg, ${theme.primary}, ${theme.primaryLight})`,
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}>
-                {"</>"}
-              </div>
-              <p style={{
-                fontFamily: "'Outfit', sans-serif",
-                fontSize: "16px",
-                color: theme.textSecondary,
-                textAlign: "center",
-                maxWidth: "280px",
-              }}>
-                Full Stack Developer
-              </p>
-              <div style={{
-                display: "flex",
-                gap: "12px",
-                marginTop: "1.5rem",
-                flexWrap: "wrap",
-                justifyContent: "center",
-              }}>
-                {["React", "Node", "MongoDB", "TypeScript"].map(tech => (
-                  <span key={tech} style={{
-                    fontFamily: "'Outfit', sans-serif",
-                    fontSize: "11px",
-                    fontWeight: 500,
-                    padding: "4px 12px",
-                    borderRadius: "100px",
-                    background: "rgba(124, 92, 255, 0.15)",
-                    color: theme.textSecondary,
-                    border: `1px solid ${theme.borderLight}`,
-                  }}>
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            </GlassCard>
-
-            {/* Floating elements */}
-            <motion.div
-              animate={{ y: [0, -15, 0], rotate: [0, 5, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              style={{
-                position: "absolute",
-                top: "-20px",
-                right: "-20px",
-                background: theme.glassBg,
-                backdropFilter: "blur(16px)",
-                border: `1px solid ${theme.borderLight}`,
-                borderRadius: "16px",
-                padding: "12px 16px",
-                fontSize: "13px",
-                color: theme.textSecondary,
-                fontFamily: "'Outfit', sans-serif",
-                boxShadow: `0 8px 32px ${theme.primaryGlow}`,
-                zIndex: 2,
-              }}
-            >
-              ✦ 3+ Projects
-            </motion.div>
-
-            <motion.div
-              animate={{ y: [0, 15, 0], rotate: [0, -5, 0] }}
-              transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-              style={{
-                position: "absolute",
-                bottom: "-10px",
-                left: "-20px",
-                background: theme.glassBg,
-                backdropFilter: "blur(16px)",
-                border: `1px solid ${theme.borderLight}`,
-                borderRadius: "16px",
-                padding: "12px 16px",
-                fontSize: "13px",
-                color: theme.textSecondary,
-                fontFamily: "'Outfit', sans-serif",
-                boxShadow: `0 8px 32px ${theme.primaryGlow}`,
-                zIndex: 2,
-              }}
-            >
-              ⚡ 1+ Year Exp
-            </motion.div>
-          </div>
+          <motion.div variants={revealUp} style={{ display: "flex", gap: "14px", flexWrap: "wrap", justifyContent: "flex-start" }}>
+            <MagButton variant="red" onClick={() => scrollToSection("work")}>
+              View Work <Arrow />
+            </MagButton>
+            <a href="https://drive.google.com/file/d/1HXf1aXYJb8db-skFx7cGjyIGGbEJm3-y/view?usp=sharing" target="_blank" rel="noopener noreferrer">
+              <MagButton variant="outline">Résumé <Arrow /></MagButton>
+            </a>
+          </motion.div>
         </motion.div>
       </section>
+
+      {/* ── SKILL MARQUEE STRIP ── */}
+      <div style={{ background: theme.black, padding: "18px 0", overflow: "hidden", position: "relative", zIndex: 1 }}>
+        <div className="marquee-track">
+          {[...Array(2)].map((_, dup) => (
+            <div key={dup} style={{ display: "flex", alignItems: "center" }}>
+              {[...skills.frontend.slice(0, 6), ...skills.backend.slice(0, 5)].map((s, i) => (
+                <span key={`${dup}-${i}`} style={{
+                  fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "22px", textTransform: "uppercase",
+                  color: theme.cream, padding: "0 26px", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: "26px",
+                }}>
+                  {s} <span style={{ color: theme.red, fontSize: "16px" }}>✦</span>
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* ── ABOUT ── */}
-      <section id="about" style={{
-        padding: "80px 48px",
-        maxWidth: "1200px",
-        margin: "0 auto",
-        position: "relative",
-        zIndex: 1,
-      }}>
-        <SectionHeading
-          eyebrow="About Me"
-          title="Building the Future,"
-          highlight="One Line at a Time"
-          description="Passionate MERN Stack Developer with a focus on creating elegant, performant, and user-centric web applications."
-        />
+      <section id="about" style={{ padding: "140px 40px", maxWidth: "1400px", margin: "0 auto", position: "relative", zIndex: 1 }}>
+        <SectionMark index="01" label="About Me" />
 
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={staggerContainer}
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: "20px",
-          }}
-          className="skills-grid"
-        >
-          {[
-            { label: "Projects", value: "5+", icon: "🚀" },
-            { label: "Experience", value: "1+ Year", icon: "💼" },
-            { label: "Technologies", value: "15+", icon: "⚡" },
-            
-          ].map((stat, i) => (
-            <motion.div
-              key={stat.label}
-              variants={fadeUp}
-              whileHover={{ y: -6 }}
-              style={{
-                background: theme.glassBg,
-                backdropFilter: "blur(16px)",
-                border: `1px solid ${theme.borderLight}`,
-                borderRadius: "20px",
-                padding: "1.5rem",
-                textAlign: "center",
-                transition: "all 0.3s ease",
-              }}
-            >
-              <div style={{ fontSize: "32px", marginBottom: "8px" }}>{stat.icon}</div>
-              <div style={{
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontSize: "28px",
-                fontWeight: 700,
-                color: theme.textPrimary,
-              }}>{stat.value}</div>
-              <div style={{
-                fontFamily: "'Outfit', sans-serif",
-                fontSize: "14px",
-                color: theme.textSecondary,
-              }}>{stat.label}</div>
-            </motion.div>
-          ))}
-        </motion.div>
-      </section>
+        <div className="split-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "70px" }}>
+          <RevealHeading
+            as="h2"
+            text="BUILDING THE FUTURE, ONE LINE OF CODE AT A TIME."
+            style={{
+              fontFamily: "'Syne', sans-serif", fontWeight: 800, textTransform: "uppercase",
+              fontSize: "clamp(2rem, 3.6vw, 3.2rem)", lineHeight: 1.06, letterSpacing: "-0.015em", color: theme.black,
+            }}
+          />
 
-      {/* ── SKILLS ── */}
-      <section id="skills" style={{
-        padding: "80px 48px",
-        maxWidth: "1200px",
-        margin: "0 auto",
-        position: "relative",
-        zIndex: 1,
-      }}>
-        <SectionHeading
-          eyebrow="My Skills"
-          title="Technical"
-          highlight="Expertise"
-          description="A comprehensive set of technologies and tools I work with to build modern web applications."
-        />
+          <div>
+            <motion.p variants={revealUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
+              style={{ fontSize: "17px", lineHeight: 1.85, color: theme.charcoal, marginBottom: "2.5rem" }}>
+              Passionate MERN Stack Developer with a focus on creating elegant, performant, and user-centric
+              web applications — from database schema to pixel-level polish.
+            </motion.p>
 
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={staggerContainer}
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr 1fr",
-            gap: "20px",
-          }}
-          className="skills-grid"
-        >
-          <motion.div variants={fadeUp}>
-            <SkillCard category="Frontend" items={skills.frontend} />
-          </motion.div>
-          <motion.div variants={fadeUp}>
-            <SkillCard category="Backend" items={skills.backend} />
-          </motion.div>
-          <motion.div variants={fadeUp}>
-            <SkillCard category="Tools" items={skills.tools} />
-          </motion.div>
-        </motion.div>
-      </section>
+            <div className="stat-row" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1px", background: theme.line, marginBottom: "2.5rem" }}>
+              {[
+                { value: "5+", label: "Projects" },
+                { value: "1+", label: "Year Experience" },
+                { value: "15+", label: "Technologies" },
+              ].map((stat) => (
+                <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }} transition={{ duration: 0.5 }}
+                  style={{ background: theme.cream, padding: "1.6rem 1.2rem" }}>
+                  <div style={{ fontFamily: "'Syne', sans-serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", fontWeight: 800, color: theme.red }}>{stat.value}</div>
+                  <div style={{ fontSize: "12px", letterSpacing: "0.05em", textTransform: "uppercase", color: theme.gray, marginTop: "4px" }}>{stat.label}</div>
+                </motion.div>
+              ))}
+            </div>
 
-      {/* ── PROJECTS ── */}
-      <section id="projects" style={{
-        padding: "80px 48px",
-        maxWidth: "1200px",
-        margin: "0 auto",
-        position: "relative",
-        zIndex: 1,
-      }}>
-        <SectionHeading
-          eyebrow="Portfolio"
-          title="Featured"
-          highlight="Projects"
-          description="A selection of my recent work showcasing full-stack development, responsive design, and modern architecture."
-        />
-
-        <div style={{ display: "flex", flexDirection: "column", gap: "80px" }}>
-          {projects.map((proj, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: i * 0.1 }}
-              viewport={{ once: true }}
-              className={`project-row ${i % 2 === 1 ? "rev" : ""}`}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "60px",
-                alignItems: "center",
-              }}
-            >
-              <div className="proj-img-wrap" style={{
-                borderRadius: "20px",
-                overflow: "hidden",
-                boxShadow: `0 20px 40px rgba(0,0,0,0.3)`,
-                transition: "all 0.5s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = `0 30px 60px ${theme.primaryGlow}`;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = "0 20px 40px rgba(0,0,0,0.3)";
-              }}>
-                <img src={proj.image} alt={proj.title} style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  display: "block",
-                  transition: "transform 0.6s ease",
-                }}
-                onMouseEnter={(e) => e.target.style.transform = "scale(1.05)"}
-                onMouseLeave={(e) => e.target.style.transform = "scale(1)"} />
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "40px" }}>
+              <div>
+                <p style={{ fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", color: theme.gray, marginBottom: "10px" }}>Languages</p>
+                {languages.map((l) => (
+                  <p key={l.name} style={{ fontSize: "14px", color: theme.charcoal, marginBottom: "4px" }}>
+                    {l.name} <span style={{ color: theme.gray }}>— {l.level}</span>
+                  </p>
+                ))}
               </div>
               <div>
-                <p style={{
-                  fontFamily: "'Outfit', sans-serif",
-                  fontSize: "12px",
-                  fontWeight: 600,
-                  color: theme.primary,
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase",
-                  marginBottom: "8px",
-                }}>{proj.category} · {proj.year}</p>
-                <h3 style={{
-                  fontFamily: "'Space Grotesk', sans-serif",
-                  fontSize: "clamp(1.8rem, 2.8vw, 2.8rem)",
-                  fontWeight: 700,
-                  color: theme.textPrimary,
-                  marginBottom: "12px",
-                  letterSpacing: "-0.02em",
-                }}>{proj.title}</h3>
-                <p style={{
-                  fontFamily: "'Outfit', sans-serif",
-                  fontSize: "15px",
-                  color: theme.textSecondary,
-                  lineHeight: 1.7,
-                  marginBottom: "1.5rem",
-                }}>{proj.desc}</p>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "1.5rem" }}>
-                  {proj.tags.map(t => (
-                    <span key={t} style={{
-                      fontFamily: "'Outfit', sans-serif",
-                      fontSize: "11px",
-                      fontWeight: 500,
-                      padding: "4px 12px",
-                      borderRadius: "100px",
-                      background: "rgba(124, 92, 255, 0.1)",
-                      color: theme.textSecondary,
-                      border: `1px solid ${theme.borderLight}`,
-                    }}>{t}</span>
-                  ))}
-                </div>
-                <div style={{ display: "flex", gap: "12px" }}>
-                  <a href={proj.liveLink} target="_blank" rel="noopener noreferrer">
-                    <Button variant="primary" style={{ padding: "10px 24px", fontSize: "13px" }}>Live Demo ↗</Button>
-                  </a>
-                  <a href={proj.repoLink} target="_blank" rel="noopener noreferrer">
-                    <Button variant="secondary" style={{ padding: "10px 24px", fontSize: "13px" }}>Code ↗</Button>
-                  </a>
-                </div>
+                <p style={{ fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", color: theme.gray, marginBottom: "10px" }}>Beyond Code</p>
+                <p style={{ fontSize: "14px", color: theme.charcoal, lineHeight: 1.8, maxWidth: "320px" }}>
+                  {hobbies.join(" · ")}
+                </p>
               </div>
-            </motion.div>
-          ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── EXPERTISE / SKILLS ── */}
+      <section id="expertise" style={{ background: theme.black, color: theme.cream, padding: "140px 40px", position: "relative", zIndex: 1 }}>
+        <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
+          <SectionMark index="02" label="What I Work With" dark />
+
+          <div className="expertise-grid" style={{ display: "grid", gridTemplateColumns: "0.8fr 2.2fr", gap: "50px", alignItems: "start" }}>
+            <RevealHeading
+              as="h2"
+              text="TOOLS & EXPERTISE"
+              style={{
+                fontFamily: "'Syne', sans-serif", fontWeight: 800, textTransform: "uppercase",
+                fontSize: "clamp(2rem, 3vw, 2.8rem)", lineHeight: 1.05, color: theme.cream,
+              }}
+            />
+
+            <div>
+              {[
+                { label: "Frontend", items: skills.frontend },
+                { label: "Backend", items: skills.backend },
+                { label: "Tools", items: skills.tools },
+              ].map((group, gi) => (
+                <motion.div
+                  key={group.label}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: gi * 0.1 }}
+                  style={{ borderTop: `1px solid ${theme.lineOnDark}`, padding: "1.8rem 0", display: "flex", gap: "30px", flexWrap: "wrap" }}
+                >
+                  <span style={{
+                    fontFamily: "'JetBrains Mono', monospace", fontSize: "12px", textTransform: "uppercase",
+                    color: theme.red, letterSpacing: "0.1em", minWidth: "110px", paddingTop: "4px",
+                  }}>{group.label}</span>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "10px 14px", flex: 1 }}>
+                    {group.items.map((s) => (
+                      <span key={s} style={{ fontFamily: "'Syne', sans-serif", fontSize: "clamp(15px, 2vw, 20px)", fontWeight: 700 }}>
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── SELECTED WORK ── */}
+      <section id="work" style={{ padding: "140px 40px 60px", maxWidth: "1400px", margin: "0 auto", position: "relative", zIndex: 1 }}>
+        <SectionMark index="03" label="Selected Work" />
+        <RevealHeading
+          as="h2"
+          text="SELECTED PROJECTS"
+          style={{
+            fontFamily: "'Syne', sans-serif", fontWeight: 800, textTransform: "uppercase",
+            fontSize: "clamp(2.4rem, 6vw, 5rem)", lineHeight: 0.98, letterSpacing: "-0.02em",
+            marginBottom: "5rem", color: theme.black,
+          }}
+        />
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "130px" }}>
+          {projects.map((proj, i) => {
+            const reverse = i % 2 === 1;
+            return (
+              <motion.div
+                key={proj.num}
+                initial={{ opacity: 0, y: 60 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-10%" }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                className="project-row"
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: reverse ? "0.85fr 1.15fr" : "1.15fr 0.85fr",
+                  gap: "50px",
+                  alignItems: "center",
+                }}
+              >
+                <div className="proj-img" style={{ order: reverse ? 2 : 1, position: "relative" }}>
+                  <span style={{
+                    position: "absolute", top: "-64px", left: reverse ? "auto" : "-10px", right: reverse ? "-10px" : "auto",
+                    fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "clamp(4rem, 9vw, 7rem)",
+                    color: "transparent", WebkitTextStroke: `1.5px ${theme.line}`, lineHeight: 1, zIndex: 0, userSelect: "none",
+                  }}>{proj.num}</span>
+                  <div style={{ position: "relative", zIndex: 1 }}>
+                    <EditorialImage src={proj.image} alt={proj.title} aspect="16 / 11" />
+                  </div>
+                </div>
+
+                <div className="proj-text" style={{ order: reverse ? 1 : 2 }}>
+                  <p style={{
+                    fontFamily: "'JetBrains Mono', monospace", fontSize: "12px", color: theme.red,
+                    letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "10px",
+                  }}>{proj.category} — {proj.year}</p>
+
+                  <h3 style={{
+                    fontFamily: "'Syne', sans-serif", fontWeight: 800, textTransform: "uppercase",
+                    fontSize: "clamp(2rem, 3.6vw, 3.4rem)", lineHeight: 1, marginBottom: "1.1rem", color: theme.black,
+                  }}>{proj.title}</h3>
+
+                  <p style={{ fontSize: "15.5px", color: theme.charcoal, lineHeight: 1.75, marginBottom: "1.5rem", maxWidth: "460px" }}>
+                    {proj.desc}
+                  </p>
+
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "2rem" }}>
+                    {proj.tags.map((t) => (
+                      <span key={t} style={{
+                        fontSize: "11px", fontWeight: 600, letterSpacing: "0.03em", textTransform: "uppercase",
+                        padding: "6px 13px", border: `1px solid ${theme.line}`, borderRadius: "100px", color: theme.gray,
+                      }}>{t}</span>
+                    ))}
+                  </div>
+
+                  <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+                    <a href={proj.liveLink} target="_blank" rel="noopener noreferrer">
+                      <MagButton variant="dark" style={{ padding: "12px 22px", fontSize: "12px" }}>Live Demo <Arrow /></MagButton>
+                    </a>
+                    <a href={proj.repoLink} target="_blank" rel="noopener noreferrer">
+                      <MagButton variant="outline" style={{ padding: "12px 22px", fontSize: "12px" }}>Code <Arrow /></MagButton>
+                    </a>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       </section>
 
       {/* ── MINI PROJECTS ── */}
-      <section id="mini" style={{
-        padding: "80px 48px",
-        maxWidth: "1200px",
-        margin: "0 auto",
-        position: "relative",
-        zIndex: 1,
-      }}>
-        <SectionHeading
-          eyebrow="Side Projects"
-          title="Mini"
-          highlight="Projects"
-          description="Smaller projects and experiments built while learning and exploring new technologies."
+      <section id="mini" style={{ padding: "100px 40px 140px", maxWidth: "1400px", margin: "0 auto", position: "relative", zIndex: 1 }}>
+        <SectionMark index="04" label="Mini Projects" />
+        <RevealHeading
+          as="h2"
+          text="SIDE EXPERIMENTS"
+          style={{
+            fontFamily: "'Syne', sans-serif", fontWeight: 800, textTransform: "uppercase",
+            fontSize: "clamp(2rem, 4.5vw, 3.4rem)", marginBottom: "3rem", color: theme.black,
+          }}
         />
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }} className="mini-grid">
-          {miniProjects.map((project, i) => (
-            <MiniProjectCard key={i} project={project} index={i} />
+        <div className="mini-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2px", background: theme.line }}>
+          {miniProjects.map((p, i) => (
+            <motion.div
+              key={p.title}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: i * 0.1 }}
+              style={{ background: theme.cream, padding: "2rem" }}
+            >
+              <EditorialImage src={p.image} alt={p.title}  />
+              <div style={{ paddingTop: "1.4rem" }}>
+                <h4 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "22px", marginBottom: "8px" }}>{p.title}</h4>
+                <p style={{ fontSize: "14px", color: theme.charcoal, lineHeight: 1.7, marginBottom: "1rem" }}>{p.description}</p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "1.3rem" }}>
+                  {p.stack.map((t) => (
+                    <span key={t} style={{ fontSize: "10.5px", fontWeight: 600, letterSpacing: "0.03em", textTransform: "uppercase", color: theme.red }}>
+                      {t}{" "}·{" "}
+                    </span>
+                  ))}
+                </div>
+                <div style={{ display: "flex", gap: "18px" }}>
+                  <a href={p.liveLink} target="_blank" rel="noopener noreferrer" className="hover-line" style={{ fontSize: "12px", fontWeight: 700, textTransform: "uppercase" }}>Live ↗</a>
+                  <a href={p.repoLink} target="_blank" rel="noopener noreferrer" className="hover-line" style={{ fontSize: "12px", fontWeight: 700, textTransform: "uppercase" }}>Code ↗</a>
+                </div>
+              </div>
+            </motion.div>
           ))}
         </div>
       </section>
 
       {/* ── EXPERIENCE ── */}
-      <section id="experience" style={{
-        padding: "80px 48px",
-        maxWidth: "1000px",
-        margin: "0 auto",
-        position: "relative",
-        zIndex: 1,
-      }}>
-        <SectionHeading
-          eyebrow="Timeline"
-          title="Experience &"
-          highlight="Learning Journey"
+      <section id="experience" style={{ padding: "0 40px 140px", maxWidth: "1100px", margin: "0 auto", position: "relative", zIndex: 1 }}>
+        <SectionMark index="05" label="Experience & Learning" />
+        <RevealHeading
+          as="h2"
+          text="TIMELINE"
+          style={{
+            fontFamily: "'Syne', sans-serif", fontWeight: 800, textTransform: "uppercase",
+            fontSize: "clamp(2rem, 4.5vw, 3.4rem)", marginBottom: "3.5rem", color: theme.black,
+          }}
         />
 
-        <div style={{ position: "relative", paddingLeft: "24px" }}>
-          <div style={{
-            position: "absolute",
-            left: "8px",
-            top: "0",
-            bottom: "0",
-            width: "2px",
-            background: `linear-gradient(to bottom, ${theme.borderLight}, ${theme.primary}, ${theme.borderLight})`,
-          }} />
+        <div>
           {education.map((e, i) => (
             <motion.div
-              key={i}
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.1, duration: 0.5 }}
+              key={e.degree}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: i * 0.08 }}
               style={{
-                position: "relative",
-                padding: "1.5rem 2rem",
-                marginBottom: i === education.length - 1 ? 0 : "1.5rem",
-                background: theme.glassBg,
-                backdropFilter: "blur(16px)",
-                border: `1px solid ${theme.borderLight}`,
-                borderRadius: "16px",
-                marginLeft: "20px",
+                display: "grid", gridTemplateColumns: "160px 1fr", gap: "30px", alignItems: "baseline",
+                padding: "2rem 0", borderTop: `1px solid ${theme.line}`,
               }}
             >
-              <div style={{
-                position: "absolute",
-                left: "-28px",
-                top: "1.5rem",
-                width: "14px",
-                height: "14px",
-                borderRadius: "50%",
-                background: theme.primary,
-                border: `2px solid ${theme.background}`,
-                boxShadow: `0 0 20px ${theme.primaryGlow}`,
-              }} />
-              <p style={{
-                fontFamily: "'Outfit', sans-serif",
-                fontSize: "12px",
-                fontWeight: 600,
-                color: theme.primary,
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                marginBottom: "4px",
-              }}>{e.year}</p>
-              <h3 style={{
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontSize: "18px",
-                fontWeight: 600,
-                color: theme.textPrimary,
-                marginBottom: "4px",
-              }}>{e.degree}</h3>
-              <p style={{
-                fontFamily: "'Outfit', sans-serif",
-                fontSize: "14px",
-                color: theme.textSecondary,
-              }}>{e.school}</p>
+              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "13px", color: theme.red }}>{e.year}</span>
+              <div>
+                <h3 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "clamp(18px, 2.4vw, 26px)", marginBottom: "6px" }}>{e.degree}</h3>
+                <p style={{ fontSize: "14.5px", color: theme.gray }}>{e.school}</p>
+              </div>
             </motion.div>
           ))}
+          <div style={{ borderTop: `1px solid ${theme.line}` }} />
         </div>
       </section>
 
       {/* ── CONTACT ── */}
-      <section id="contact" style={{
-        padding: "80px 48px 60px",
-        maxWidth: "1200px",
-        margin: "0 auto",
-        position: "relative",
-        zIndex: 1,
-      }}>
-        <div className="contact-grid" style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "60px",
-          alignItems: "start",
-        }}>
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <p style={{
-              fontFamily: "'Outfit', sans-serif",
-              fontSize: "14px",
-              fontWeight: 600,
-              color: theme.primary,
-              letterSpacing: "0.15em",
-              textTransform: "uppercase",
-              marginBottom: "0.75rem",
-            }}>Let's Connect</p>
-            <h2 style={{
-              fontFamily: "'Space Grotesk', sans-serif",
-              fontSize: "clamp(2.8rem, 5vw, 4.5rem)",
-              fontWeight: 700,
-              lineHeight: 1.05,
-              letterSpacing: "-0.02em",
-              marginBottom: "1.5rem",
-            }}>
-              Let's Build<br />
-              <span style={{ color: theme.primary }}>Something</span> Great
-            </h2>
-            <p style={{
-              fontFamily: "'Outfit', sans-serif",
-              fontSize: "16px",
-              color: theme.textSecondary,
-              lineHeight: 1.8,
-              maxWidth: "360px",
-              marginBottom: "2rem",
-            }}>
-              Open to freelance, full-time roles, and collaborations. Have an idea? Let's talk.
-            </p>
-            <div style={{ display: "flex", gap: "12px" }}>
-              <a href="https://github.com/wafathima" target="_blank" rel="noopener noreferrer">
-                <Button variant="secondary">GitHub ↗</Button>
-              </a>
-              <a href="https://linkedin.com/in/wafa-fathima-1538wf" target="_blank" rel="noopener noreferrer">
-                <Button variant="secondary">LinkedIn ↗</Button>
-              </a>
-            </div>
-          </motion.div>
+      <section id="contact" style={{ background: theme.red, color: theme.white, padding: "140px 40px 100px", position: "relative", zIndex: 1 }}>
+        <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
+          <SectionMark index="06" label="Get In Touch" dark />
 
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-          >
-            <GlassCard>
+          <RevealHeading
+            as="h2"
+            text="LET'S BUILD SOMETHING GREAT."
+            style={{
+              fontFamily: "'Syne', sans-serif", fontWeight: 800, textTransform: "uppercase",
+              fontSize: "clamp(2.4rem, 7vw, 6rem)", lineHeight: 0.98, letterSpacing: "-0.02em",
+              marginBottom: "3rem", maxWidth: "1000px", color: theme.white,
+            }}
+          />
+
+          <div className="split-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "60px", alignItems: "start" }}>
+            <div>
+              <p style={{ fontSize: "17px", lineHeight: 1.8, maxWidth: "420px", color: "rgba(255,255,255,0.85)", marginBottom: "2rem" }}>
+                Open to freelance work, full-time roles, and collaborations. Have an idea? Let's talk.
+              </p>
+              <a href="mailto:wafathima15@gmail.com" style={{
+                fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "clamp(20px, 2.6vw, 28px)",
+                display: "inline-flex", alignItems: "center", gap: "12px",
+              }} className="hover-line">
+                wafathima15@gmail.com <Arrow rotate={-45} />
+              </a>
+
+              <div style={{ display: "flex", gap: "12px", marginTop: "2.5rem", flexWrap: "wrap" }}>
+                <a href="https://github.com/wafathima" target="_blank" rel="noopener noreferrer">
+                  <MagButton variant="outlineLight">GitHub <Arrow /></MagButton>
+                </a>
+                <a href="https://linkedin.com/in/wafa-fathima-1538wf" target="_blank" rel="noopener noreferrer">
+                  <MagButton variant="outlineLight">LinkedIn <Arrow /></MagButton>
+                </a>
+                <a href="https://drive.google.com/file/d/1HXf1aXYJb8db-skFx7cGjyIGGbEJm3-y/view?usp=sharing" target="_blank" rel="noopener noreferrer">
+                  <MagButton variant="outlineLight">Résumé <Arrow /></MagButton>
+                </a>
+              </div>
+            </div>
+
+            <div style={{ background: theme.cream, borderRadius: "4px", padding: "2rem", color: theme.black }}>
               {sent ? (
                 <div style={{ padding: "20px 0", textAlign: "center" }}>
-                  <p style={{
-                    fontFamily: "'Space Grotesk', sans-serif",
-                    fontSize: "24px",
-                    fontWeight: 700,
-                    color: theme.success,
-                    marginBottom: "8px",
-                  }}>Message sent ✓</p>
-                  <p style={{
-                    fontFamily: "'Outfit', sans-serif",
-                    fontSize: "14px",
-                    color: theme.textSecondary,
-                    lineHeight: 1.7,
-                  }}>Thanks for reaching out — I'll get back to you soon.</p>
-                  <Button variant="secondary" style={{ marginTop: "20px" }} onClick={() => setSent(false)}>Send another →</Button>
+                  <p style={{ fontFamily: "'Syne', sans-serif", fontSize: "24px", fontWeight: 700, marginBottom: "8px" }}>Message sent ✓</p>
+                  <p style={{ fontSize: "14px", color: theme.gray, lineHeight: 1.7, marginBottom: "20px" }}>
+                    Thanks for reaching out — I'll get back to you soon.
+                  </p>
+                  <MagButton variant="outline" onClick={() => setSent(false)}>Send another <Arrow /></MagButton>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit}>
                   {[["name", "text", "Your Name", "Jane Smith"], ["email", "email", "Email Address", "jane@example.com"]].map(([name, type, label, ph]) => (
                     <div key={name} style={{ marginBottom: "16px" }}>
-                      <label style={{
-                        fontFamily: "'Outfit', sans-serif",
-                        fontSize: "12px",
-                        fontWeight: 600,
-                        color: theme.textSecondary,
-                        display: "block",
-                        marginBottom: "6px",
-                        letterSpacing: "0.06em",
-                        textTransform: "uppercase",
-                      }}>{label}</label>
+                      <label style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: theme.gray, display: "block", marginBottom: "6px" }}>{label}</label>
                       <input
                         type={type}
                         name={name}
                         value={formData[name]}
-                        onChange={e => setFormData(p => ({ ...p, [e.target.name]: e.target.value }))}
+                        onChange={(e) => setFormData((p) => ({ ...p, [e.target.name]: e.target.value }))}
                         placeholder={ph}
-                        style={{
-                          fontFamily: "'Outfit', sans-serif",
-                          width: "100%",
-                          padding: "14px 18px",
-                          background: "rgba(255,255,255,0.03)",
-                          border: `1px solid ${theme.borderLight}`,
-                          borderRadius: "12px",
-                          color: theme.textPrimary,
-                          fontSize: "14px",
-                          transition: "all 0.3s ease",
-                          outline: "none",
-                        }}
-                        onFocus={(e) => {
-                          e.target.style.borderColor = theme.primary;
-                          e.target.style.boxShadow = `0 0 0 4px ${theme.primaryGlow}`;
-                        }}
-                        onBlur={(e) => {
-                          e.target.style.borderColor = theme.borderLight;
-                          e.target.style.boxShadow = "none";
-                        }}
                         required
+                        style={{
+                          width: "100%", padding: "13px 4px", background: "transparent",
+                          border: "none", borderBottom: `1px solid ${theme.line}`, color: theme.black,
+                          fontSize: "14px", outline: "none", borderRadius: 0,
+                        }}
+                        onFocus={(e) => (e.target.style.borderBottomColor = theme.red)}
+                        onBlur={(e) => (e.target.style.borderBottomColor = theme.line)}
                       />
                     </div>
                   ))}
-                  <div style={{ marginBottom: "20px" }}>
-                    <label style={{
-                      fontFamily: "'Outfit', sans-serif",
-                      fontSize: "12px",
-                      fontWeight: 600,
-                      color: theme.textSecondary,
-                      display: "block",
-                      marginBottom: "6px",
-                      letterSpacing: "0.06em",
-                      textTransform: "uppercase",
-                    }}>Message</label>
+                  <div style={{ marginBottom: "22px" }}>
+                    <label style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: theme.gray, display: "block", marginBottom: "6px" }}>Message</label>
                     <textarea
                       name="message"
                       value={formData.message}
-                      onChange={e => setFormData(p => ({ ...p, message: e.target.value }))}
+                      onChange={(e) => setFormData((p) => ({ ...p, message: e.target.value }))}
                       placeholder="Your message here…"
-                      style={{
-                        fontFamily: "'Outfit', sans-serif",
-                        width: "100%",
-                        padding: "14px 18px",
-                        background: "rgba(255,255,255,0.03)",
-                        border: `1px solid ${theme.borderLight}`,
-                        borderRadius: "12px",
-                        color: theme.textPrimary,
-                        fontSize: "14px",
-                        transition: "all 0.3s ease",
-                        outline: "none",
-                        resize: "vertical",
-                        minHeight: "120px",
-                      }}
-                      onFocus={(e) => {
-                        e.target.style.borderColor = theme.primary;
-                        e.target.style.boxShadow = `0 0 0 4px ${theme.primaryGlow}`;
-                      }}
-                      onBlur={(e) => {
-                        e.target.style.borderColor = theme.borderLight;
-                        e.target.style.boxShadow = "none";
-                      }}
                       required
+                      style={{
+                        width: "100%", padding: "13px 4px", background: "transparent",
+                        border: "none", borderBottom: `1px solid ${theme.line}`, color: theme.black,
+                        fontSize: "14px", outline: "none", resize: "vertical", minHeight: "100px", borderRadius: 0,
+                      }}
+                      onFocus={(e) => (e.target.style.borderBottomColor = theme.red)}
+                      onBlur={(e) => (e.target.style.borderBottomColor = theme.line)}
                     />
                   </div>
-                  <Button type="submit" variant="primary" style={{ width: "100%", padding: "16px" }}>
-                    {isSubmitting ? "Sending…" : "Send Message →"}
-                  </Button>
+                  <MagButton type="submit" variant="dark" style={{ width: "100%", justifyContent: "center", padding: "16px" }}>
+                    {isSubmitting ? "Sending…" : "Send Message"} <Arrow />
+                  </MagButton>
                 </form>
               )}
-            </GlassCard>
-          </motion.div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* ── FOOTER ── */}
       <footer style={{
-        borderTop: `1px solid ${theme.borderLight}`,
-        padding: "30px 48px",
-        maxWidth: "1200px",
-        margin: "0 auto",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        flexWrap: "wrap",
-        gap: "16px",
-        position: "relative",
-        zIndex: 1,
+        padding: "36px 40px", maxWidth: "1400px", margin: "0 auto",
+        display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px",
+        position: "relative", zIndex: 1,
       }}>
-        <p style={{
-          fontFamily: "'Space Grotesk', sans-serif",
-          fontSize: "18px",
-          fontWeight: 700,
-          color: theme.textMuted,
-        }}>
-          Wafa<span style={{ color: theme.primary }}>.</span>
+        <p style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "16px" }}>
+          WAFA<span style={{ color: theme.red }}>.</span>
         </p>
-        <p style={{
-          fontFamily: "'Outfit', sans-serif",
-          fontSize: "12px",
-          color: theme.textMuted,
-        }}>© 2026 — All rights reserved</p>
-        <div style={{ display: "flex", gap: "20px" }}>
+        <p style={{ fontSize: "12px", color: theme.gray }}>© 2026 — All rights reserved</p>
+        <div style={{ display: "flex", gap: "22px", alignItems: "center" }}>
           {[["GitHub", "https://github.com/wafathima"], ["LinkedIn", "https://linkedin.com/in/wafa-fathima-1538wf"], ["Email", "mailto:wafathima15@gmail.com"]].map(([l, h]) => (
-            <a
-              key={l}
-              href={h}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                fontFamily: "'Outfit', sans-serif",
-                fontSize: "12px",
-                fontWeight: 500,
-                color: theme.textMuted,
-                transition: "color 0.3s ease",
-              }}
-              onMouseEnter={(e) => e.target.style.color = theme.primary}
-              onMouseLeave={(e) => e.target.style.color = theme.textMuted}
-            >
+            <a key={l} href={h} target="_blank" rel="noopener noreferrer" className="hover-line"
+              style={{ fontSize: "12px", fontWeight: 600, color: theme.gray, textTransform: "uppercase", letterSpacing: "0.03em" }}>
               {l}
             </a>
           ))}
-          <button
-            onClick={() => scrollToSection("top")}
-            style={{
-              fontFamily: "'Outfit', sans-serif",
-              fontSize: "12px",
-              fontWeight: 500,
-              color: theme.textMuted,
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              transition: "color 0.3s ease",
-            }}
-            onMouseEnter={(e) => e.target.style.color = theme.primary}
-            onMouseLeave={(e) => e.target.style.color = theme.textMuted}
-          >
-            ↑ Back to Top
+          <button onClick={() => scrollToSection("top")} style={{
+            fontSize: "12px", fontWeight: 600, color: theme.gray, background: "none", border: "none",
+            cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.03em",
+          }} className="hover-line">
+            ↑ Top
           </button>
         </div>
       </footer>
