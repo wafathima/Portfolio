@@ -26,7 +26,7 @@ const theme = {
 
 const skills = {
   frontend: ["TypeScript", "Next.js", "React.js", "Redux", "JavaScript", "HTML", "CSS", "Tailwind CSS", "Responsive Design", "UI/UX Principles", "Axios", "React Router"],
-  backend: ["Node.js", "Express.js", "MongoDB", "REST APIs", "JWT Auth", "Mongoose", "Data Design", "Server-side Logic", "Performance Optimization"],
+  backend: ["Node.js", "Express.js", "MongoDB", "REST APIs", "JWT Auth", "Mongoose", "Data Design", "Server-side Logic", "Performance Optimization","SQL","PostgreSQL "],
   tools: ["Git & GitHub", "Postman", "Vercel", "Figma", "VS Code", "Docker"],
 };
 
@@ -44,7 +44,7 @@ const projects = [
     year: "2026",
     image: havenix,
     desc: "A full-stack property platform for buying and selling real estate. Built with advanced search, full CRUD functionality, and a clean performant user interface.",
-    tags: ["MERN", "Real Estate", "CRUD", "Tailwind", "Axios"],
+    tags: ["MERN", "Real Estate", "CRUD", "Tailwind", "Axios","Docker"],
     liveLink: "https://havenix-copy-frontend-ogc3.onrender.com/",
     repoLink: "https://github.com/wafathima/Havenix",
   },
