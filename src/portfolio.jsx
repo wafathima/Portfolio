@@ -6,6 +6,7 @@ import lio from "./assets/images/lio.png";
 import playora from "./assets/images/playora.png";
 import notepad from "./assets/images/notepad.png";
 import todo from "./assets/images/todo.png";
+import expense from "./assets/images/expense.png";
 
 /* ============================================================
    DESIGN TOKENS — editorial / creative-studio system
