@@ -27,7 +27,7 @@ const theme = {
 const skills = {
   frontend: ["TypeScript", "Next.js", "React.js", "Redux", "JavaScript", "HTML", "CSS", "Tailwind CSS", "Responsive Design", "UI/UX Principles", "Axios", "React Router"],
   backend: ["Node.js", "Express.js", "MongoDB", "REST APIs", "JWT Auth", "Mongoose", "Data Design", "Server-side Logic", "Performance Optimization","SQL","PostgreSQL "],
-  tools: ["Git & GitHub", "Postman", "Vercel", "Figma", "VS Code", "Docker"],
+  tools: ["Git & GitHub", "Postman", "Vercel", "Figma", "VS Code", "Docker","AWS","Cloud Computing"],
 };
 
 const education = [
@@ -90,6 +90,15 @@ const miniProjects = [
     repoLink: "https://github.com/wafathima/TypescriptProject",
     liveLink: "https://todo-frontend-w23l.onrender.com/",
   },
+     {
+    title: "Expense Tracker",
+    image: expense tracker,
+    description: "A full-stack expense management application that allows users to securely register, log in, and track their income and expenses. Built with Next.js, TypeScript, Express.js, PostgreSQL, Docker, and AWS EC2, with Nginx and HTTPS configured for secure production deployment.",
+    stack: ["Next.js", "TypeScript", "Docker","PostgreSQL","AWS"],
+    repoLink: "https://github.com/wafathima/Expense_track",
+    liveLink: "https://wafa-expense-tracker.duckdns.org/",
+  },
+   
 ];
 
 const languages = [{ name: "English", level: "Intermediate" }, { name: "Malayalam", level: "Fluent" }];
