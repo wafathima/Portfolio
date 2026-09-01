@@ -92,7 +92,7 @@ const miniProjects = [
   },
      {
     title: "Expense Tracker",
-    image: expense tracker,
+    image: expense,
     description: "A full-stack expense management application that allows users to securely register, log in, and track their income and expenses. Built with Next.js, TypeScript, Express.js, PostgreSQL, Docker, and AWS EC2, with Nginx and HTTPS configured for secure production deployment.",
     stack: ["Next.js", "TypeScript", "Docker","PostgreSQL","AWS"],
     repoLink: "https://github.com/wafathima/Expense_track",
