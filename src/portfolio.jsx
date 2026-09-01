@@ -740,47 +740,269 @@ export default function Portfolio() {
       </section>
 
       {/* ── MINI PROJECTS ── */}
-      <section id="mini" style={{ padding: "100px 40px 140px", maxWidth: "1400px", margin: "0 auto", position: "relative", zIndex: 1 }}>
-        <SectionMark index="04" label="Mini Projects" />
-        <RevealHeading
-          as="h2"
-          text="SIDE EXPERIMENTS"
-          style={{
-            fontFamily: "'Syne', sans-serif", fontWeight: 800, textTransform: "uppercase",
-            fontSize: "clamp(2rem, 4.5vw, 3.4rem)", marginBottom: "3rem", color: theme.black,
-          }}
-        />
+      {/* ── MINI PROJECTS ── */}
+<section id="mini" style={{ 
+  padding: "100px 40px 140px", 
+  maxWidth: "1400px", 
+  margin: "0 auto", 
+  position: "relative", 
+  zIndex: 1 
+}}>
+  <SectionMark index="04" label="Mini Projects" />
+  <RevealHeading
+    as="h2"
+    text="SIDE EXPERIMENTS"
+    style={{
+      fontFamily: "'Syne', sans-serif", 
+      fontWeight: 800, 
+      textTransform: "uppercase",
+      fontSize: "clamp(2rem, 4.5vw, 3.4rem)", 
+      marginBottom: "1.5rem", 
+      color: theme.black,
+    }}
+  />
+  
+  {/* Mini projects description */}
+  <motion.p
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.6, delay: 0.1 }}
+    style={{
+      fontSize: "17px",
+      lineHeight: 1.7,
+      color: theme.charcoal,
+      maxWidth: "600px",
+      marginBottom: "3.5rem",
+    }}
+  >
+    Quick experiments and smaller projects that showcase my versatility across different technologies and problem-solving approaches.
+  </motion.p>
 
-        <div className="mini-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2px", background: theme.line }}>
-          {miniProjects.map((p, i) => (
-            <motion.div
-              key={p.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: i * 0.1 }}
-              style={{ background: theme.cream, padding: "2rem" }}
-            >
-              <EditorialImage src={p.image} alt={p.title}  />
-              <div style={{ paddingTop: "1.4rem" }}>
-                <h4 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "22px", marginBottom: "8px" }}>{p.title}</h4>
-                <p style={{ fontSize: "14px", color: theme.charcoal, lineHeight: 1.7, marginBottom: "1rem" }}>{p.description}</p>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "1.3rem" }}>
-                  {p.stack.map((t) => (
-                    <span key={t} style={{ fontSize: "10.5px", fontWeight: 600, letterSpacing: "0.03em", textTransform: "uppercase", color: theme.red }}>
-                      {t}{" "}·{" "}
-                    </span>
-                  ))}
-                </div>
-                <div style={{ display: "flex", gap: "18px" }}>
-                  <a href={p.liveLink} target="_blank" rel="noopener noreferrer" className="hover-line" style={{ fontSize: "12px", fontWeight: 700, textTransform: "uppercase" }}>Live ↗</a>
-                  <a href={p.repoLink} target="_blank" rel="noopener noreferrer" className="hover-line" style={{ fontSize: "12px", fontWeight: 700, textTransform: "uppercase" }}>Code ↗</a>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+  <div className="mini-grid" style={{ 
+    display: "grid", 
+    gridTemplateColumns: "1fr 1fr 1fr", 
+    gap: "30px",
+    background: "transparent",
+  }}>
+    {miniProjects.map((p, i) => (
+      <motion.div
+        key={p.title}
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.7, delay: i * 0.12 }}
+        style={{ 
+          background: theme.white, 
+          borderRadius: "12px",
+          overflow: "hidden",
+          boxShadow: "0 4px 20px rgba(19, 17, 16, 0.06)",
+          border: `1px solid ${theme.line}`,
+          transition: "transform 0.3s ease, box-shadow 0.3s ease",
+        }}
+        whileHover={{
+          y: -8,
+          boxShadow: "0 12px 40px rgba(19, 17, 16, 0.12)",
+          transition: { duration: 0.3 }
+        }}
+      >
+        {/* Image Container with overlay gradient */}
+        <div style={{ position: "relative", overflow: "hidden", aspectRatio: "16/10" }}>
+          <EditorialImage src={p.image} alt={p.title} radius="0px" />
+          {/* Gradient overlay on hover */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileHover={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: "linear-gradient(180deg, transparent 50%, rgba(163, 33, 28, 0.12) 100%)",
+              pointerEvents: "none",
+            }}
+          />
+          
+          {/* Tag badge */}
+          <div style={{
+            position: "absolute",
+            top: "12px",
+            right: "12px",
+            background: theme.black,
+            color: theme.cream,
+            padding: "4px 14px",
+            borderRadius: "100px",
+            fontSize: "10px",
+            fontWeight: 700,
+            letterSpacing: "0.06em",
+            textTransform: "uppercase",
+          }}>
+            {i === 0 ? "Featured" : i === 1 ? "Popular" : "New"}
+          </div>
         </div>
-      </section>
+
+        {/* Content */}
+        <div style={{ padding: "1.8rem 1.8rem 2rem" }}>
+          <div style={{ 
+            display: "flex", 
+            justifyContent: "space-between", 
+            alignItems: "flex-start",
+            marginBottom: "12px",
+          }}>
+            <h4 style={{ 
+              fontFamily: "'Syne', sans-serif", 
+              fontWeight: 700, 
+              fontSize: "22px",
+              color: theme.black,
+            }}>
+              {p.title}
+            </h4>
+            <span style={{
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: "12px",
+              color: theme.red,
+              fontWeight: 500,
+              whiteSpace: "nowrap",
+              marginLeft: "12px",
+            }}>
+              v1.0
+            </span>
+          </div>
+          
+          <p style={{ 
+            fontSize: "14px", 
+            color: theme.charcoal, 
+            lineHeight: 1.7, 
+            marginBottom: "1.2rem",
+            opacity: 0.85,
+          }}>
+            {p.description}
+          </p>
+          
+          {/* Tech stack with icons */}
+          <div style={{ 
+            display: "flex", 
+            flexWrap: "wrap", 
+            gap: "6px 10px", 
+            marginBottom: "1.5rem",
+            paddingTop: "0.8rem",
+            borderTop: `1px solid ${theme.line}`,
+          }}>
+            {p.stack.map((t) => (
+              <span key={t} style={{ 
+                fontSize: "11px", 
+                fontWeight: 600, 
+                letterSpacing: "0.03em", 
+                textTransform: "uppercase",
+                color: theme.red,
+                background: "rgba(163, 33, 28, 0.06)",
+                padding: "4px 12px",
+                borderRadius: "100px",
+              }}>
+                {t}
+              </span>
+            ))}
+          </div>
+          
+          {/* Action buttons with better styling */}
+          <div style={{ 
+            display: "flex", 
+            gap: "14px",
+            alignItems: "center",
+          }}>
+            <a 
+              href={p.liveLink} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                fontSize: "13px",
+                fontWeight: 700,
+                textTransform: "uppercase",
+                color: theme.black,
+                padding: "8px 20px",
+                borderRadius: "100px",
+                background: theme.cream,
+                border: `1px solid ${theme.line}`,
+                transition: "all 0.25s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = theme.black;
+                e.currentTarget.style.color = theme.cream;
+                e.currentTarget.style.borderColor = theme.black;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = theme.cream;
+                e.currentTarget.style.color = theme.black;
+                e.currentTarget.style.borderColor = theme.line;
+              }}
+            >
+              Live Demo
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <line x1="5" y1="19" x2="19" y2="5" />
+                <polyline points="7 5 19 5 19 17" />
+              </svg>
+            </a>
+            <a 
+              href={p.repoLink} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover-line"
+              style={{ 
+                fontSize: "12px", 
+                fontWeight: 600,
+                color: theme.gray,
+                textTransform: "uppercase",
+                letterSpacing: "0.04em",
+              }}
+            >
+              View Code →
+            </a>
+          </div>
+        </div>
+      </motion.div>
+    ))}
+  </div>
+
+  {/* View all projects CTA */}
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.6, delay: 0.4 }}
+    style={{
+      textAlign: "center",
+      marginTop: "3.5rem",
+    }}
+  >
+    <a href="https://github.com/wafathima" target="_blank" rel="noopener noreferrer">
+      <MagButton variant="outline" style={{ padding: "14px 36px", fontSize: "13px" }}>
+        Explore More on GitHub
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" style={{ marginLeft: "4px" }}>
+          <line x1="5" y1="19" x2="19" y2="5" />
+          <polyline points="7 5 19 5 19 17" />
+        </svg>
+      </MagButton>
+    </a>
+  </motion.div>
+
+  {/* Responsive styles for mini projects */}
+  <style>{`
+    @media (max-width: 968px) {
+      .mini-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 20px !important;
+      }
+    }
+    @media (max-width: 640px) {
+      .mini-grid {
+        grid-template-columns: 1fr !important;
+        gap: 24px !important;
+      }
+    }
+  `}</style>
+</section>
 
       {/* ── EXPERIENCE ── */}
       <section id="experience" style={{ padding: "0 40px 140px", maxWidth: "1100px", margin: "0 auto", position: "relative", zIndex: 1 }}>
