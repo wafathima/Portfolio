@@ -420,7 +420,7 @@ export default function Portfolio() {
               {item.label}
             </a>
           ))}
-          <a href="https://drive.google.com/file/d/1HXf1aXYJb8db-skFx7cGjyIGGbEJm3-y/view?usp=sharing" target="_blank" rel="noopener noreferrer">
+          <a href="https://drive.google.com/file/d/1MBv2_DqK9GUmhqMo6w-zqlAd2UdY4m93/view?usp=sharing" target="_blank" rel="noopener noreferrer">
             <MagButton variant="dark" style={{ padding: "10px 22px", fontSize: "12px" }}>Resume</MagButton>
           </a>
         </div>
@@ -530,7 +530,7 @@ export default function Portfolio() {
             <MagButton variant="red" onClick={() => scrollToSection("work")}>
               View Work <Arrow />
             </MagButton>
-            <a href="https://drive.google.com/file/d/1HXf1aXYJb8db-skFx7cGjyIGGbEJm3-y/view?usp=sharing" target="_blank" rel="noopener noreferrer">
+            <a href="https://drive.google.com/file/d/1MBv2_DqK9GUmhqMo6w-zqlAd2UdY4m93/view?usp=sharing" target="_blank" rel="noopener noreferrer">
               <MagButton variant="outline">Résumé <Arrow /></MagButton>
             </a>
           </motion.div>
@@ -1074,7 +1074,7 @@ export default function Portfolio() {
                 <a href="https://linkedin.com/in/wafa-fathima-1538wf" target="_blank" rel="noopener noreferrer">
                   <MagButton variant="outlineLight">LinkedIn <Arrow /></MagButton>
                 </a>
-                <a href="https://drive.google.com/file/d/1HXf1aXYJb8db-skFx7cGjyIGGbEJm3-y/view?usp=sharing" target="_blank" rel="noopener noreferrer">
+                <a href="https://drive.google.com/file/d/1MBv2_DqK9GUmhqMo6w-zqlAd2UdY4m93/view?usp=sharing" target="_blank" rel="noopener noreferrer">
                   <MagButton variant="outlineLight">Résumé <Arrow /></MagButton>
                 </a>
               </div>
