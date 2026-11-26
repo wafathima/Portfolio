@@ -1,4 +1,3 @@
-// All personal/professional data — preserved verbatim from the original portfolio.
 
 import havenix from '../assets/images/havenix.png';
 import lio from '../assets/images/lio.png';
@@ -31,7 +30,7 @@ export const skills = {
   frontend: [
     'TypeScript', 'Next.js', 'React.js', 'Redux', 'JavaScript', 'HTML',
     'CSS', 'Tailwind CSS', 'Responsive Design', 'UI/UX Principles',
-    'Axios', 'React Router',
+    'Axios', 'React Router','Three.js',
   ],
   backend: [
     'Node.js', 'Express.js', 'MongoDB', 'REST APIs', 'JWT Auth',

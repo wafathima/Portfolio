@@ -1,7 +1,3 @@
-/* galaxy.css — import AFTER index.css in main.jsx:
-   import './index.css';
-   import './galaxy.css';                                  */
-
 :root {
   --bg: #03030A;
   --bg-2: #070716;
@@ -28,10 +24,10 @@ main, .footer { position: relative; z-index: 1; }
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(60% 50% at 82% 8%,  rgba(182, 156, 255, 0.18), transparent 70%),
-    radial-gradient(50% 45% at 8% 38%,  rgba(139, 233, 255, 0.10), transparent 70%),
-    radial-gradient(55% 50% at 70% 92%, rgba(255, 138, 216, 0.12), transparent 70%),
-    var(--bg);
+    radial-gradient(70% 55% at 78% 12%, rgba(120, 90, 220, 0.14), transparent 70%),
+    radial-gradient(60% 50% at 10% 70%, rgba(40, 90, 200, 0.08), transparent 70%),
+    radial-gradient(50% 40% at 85% 95%, rgba(200, 70, 150, 0.07), transparent 70%),
+    #02020a;
 }
 .galaxy-bg canvas { width: 100% !important; height: 100% !important; }
 
@@ -196,3 +192,5 @@ main, .footer { position: relative; z-index: 1; }
   .shooting-star { display: none; }
   .hero-name .italic, .section-title .accent { animation: none; }
 }
+
+.hero-3d-bg canvas { mix-blend-mode: screen; }

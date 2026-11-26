@@ -1,72 +1,52 @@
-//projects
-import { motion, useReducedMotion } from 'framer-motion';
+// //projects
 import { ArrowUpRight } from 'lucide-react';
 import GithubIcon from './GithubIcon';
 import Section from './Section';
 import Reveal from './Reveal';
+import { onSpot } from './spotlight';
 import { projects } from '../data/portfolio';
 
-const EASE = [0.19, 1, 0.22, 1];
-
 function ProjectCard({ project, index }) {
-  const reduced = useReducedMotion();
-  const isReverse = index % 2 === 1;
-  const num = String(index + 1).padStart(2, '0');
-
+  const featured = index === 0;
   return (
-    <div className={`project ${isReverse ? 'reverse' : ''}`}>
-      <motion.div
-        className="project-media"
-        initial={reduced ? false : { opacity: 0, y: 60, scale: 0.96 }}
-        whileInView={{ opacity: 1, y: 0, scale: 1 }}
-        viewport={{ once: true, margin: '-15% 0px' }}
-        transition={{ duration: 1.2, ease: EASE }}
+    <Reveal
+      className={`card project-card${featured ? ' featured' : ''}`}
+      delay={(index % 2) * 0.08}
+      onMouseMove={onSpot}
+    >
+      <a
+        className="card-media"
+        href={project.liveLink}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`Open ${project.title} live preview`}
       >
         <img src={project.image} alt={`${project.title} — ${project.category}`} loading="lazy" />
-      </motion.div>
+        <span className="card-go"><ArrowUpRight size={18} /></span>
+      </a>
 
-      <div className="project-info">
-        <Reveal delay={0.05}>
-          <p className="project-number">
-            {num} — {project.category} / {project.year}
-          </p>
-        </Reveal>
-        <Reveal delay={0.1}>
-          <h3 className="project-title">{project.title}</h3>
-        </Reveal>
-        <Reveal delay={0.15}>
-          <p className="project-desc">{project.desc}</p>
-        </Reveal>
-        <Reveal delay={0.2}>
-          <div className="project-tags">
-            {project.tags.map((t) => (
-              <span key={t} className="tag">{t}</span>
-            ))}
-          </div>
-        </Reveal>
-        <Reveal delay={0.25}>
-          <div className="project-links">
-            <a
-              href={project.liveLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-primary btn-sm"
-            >
-              <span>Live Preview</span>
-              <ArrowUpRight size={14} style={{ position: 'relative', zIndex: 1 }} />
-            </a>
-            <a
-              href={project.repoLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-ghost btn-sm"
-            >
-              <GithubIcon size={14} /> Repository
-            </a>
-          </div>
-        </Reveal>
+      <div className="card-body">
+        <div className="card-meta">
+          <span>{project.category}</span>
+          <i />
+          <span>{project.year}</span>
+        </div>
+        <h3 className="card-title">{project.title}</h3>
+        <p className="card-desc">{project.desc}</p>
+        <div className="chips">
+          {project.tags.map((t) => <span key={t} className="chip chip-sm">{t}</span>)}
+        </div>
+        <div className="card-actions">
+          <a href={project.liveLink} target="_blank" rel="noopener noreferrer" className="btn btn-primary btn-sm">
+            <span>Live preview</span>
+            <ArrowUpRight size={14} style={{ position: 'relative', zIndex: 1 }} />
+          </a>
+          <a href={project.repoLink} target="_blank" rel="noopener noreferrer" className="btn btn-ghost btn-sm">
+            <GithubIcon size={14} /> Repository
+          </a>
+        </div>
       </div>
-    </div>
+    </Reveal>
   );
 }
 
@@ -74,19 +54,12 @@ export default function Projects() {
   return (
     <Section
       id="work"
-      number="01"
-      eyebrow="Selected Work"
-      title={
-        <>
-          Selected <span className="accent">projects.</span>
-        </>
-      }
+      eyebrow="Selected work"
+      title={<>Selected <span className="accent">projects.</span></>}
       sub="Full-stack products I designed, built and deployed."
     >
-      <div>
-        {projects.map((p, i) => (
-          <ProjectCard key={p.title} project={p} index={i} />
-        ))}
+      <div className="cards-grid">
+        {projects.map((p, i) => <ProjectCard key={p.title} project={p} index={i} />)}
       </div>
     </Section>
   );

@@ -1,34 +1,3 @@
-// //app.jsx
-// import Navigation from './components/Navigation';
-// import Hero from './components/Hero';
-// import Projects from './components/Projects';
-// import About from './components/About';
-// import Skills from './components/Skills';
-// import Experience from './components/Experience';
-// import Education from './components/Education';
-// import MiniProjects from './components/MiniProjects';
-// import Contact from './components/Contact';
-// import Footer from './components/Footer';
-
-// export default function App() {
-//   return (
-//     <>
-//       <Navigation />
-//       <main>
-//         <Hero />
-//         <Projects />
-//         <About />
-//         <Skills />
-//         <Experience />
-//         <Education />
-//         <MiniProjects />
-//         <Contact />
-//       </main>
-//       <Footer />
-//     </>
-//   );
-// }
-
 import { lazy, Suspense } from 'react';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import Navigation from './components/Navigation';

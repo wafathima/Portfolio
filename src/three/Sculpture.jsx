@@ -1,211 +1,104 @@
-// //sculpture
-// import { useRef, useMemo } from 'react';
-// import { useFrame } from '@react-three/fiber';
-// import { MeshTransmissionMaterial, Icosahedron, Torus } from '@react-three/drei';
-// import * as THREE from 'three';
-
-// export default function Sculpture({ mouse, reduced = false, isMobile = false }) {
-//   const group = useRef();
-//   const core = useRef();
-//   const ringA = useRef();
-//   const ringB = useRef();
-//   const ringC = useRef();
-//   const target = useMemo(() => new THREE.Vector2(0, 0), []);
-
-//   useFrame((state, delta) => {
-//     if (!group.current) return;
-//     const t = state.clock.getElapsedTime();
-
-//     target.set(mouse.current.x * 0.4, mouse.current.y * 0.4);
-//     const lerp = Math.min(1, delta * 3);
-//     group.current.rotation.y += (target.x - group.current.rotation.y) * lerp;
-//     group.current.rotation.x += (-target.y - group.current.rotation.x) * lerp;
-
-//     if (reduced) return;
-
-//     group.current.position.y = Math.sin(t * 0.5) * 0.15;
-
-//     if (ringA.current) ringA.current.rotation.z = t * 0.16;
-//     if (ringB.current) {
-//       ringB.current.rotation.z = -t * 0.12;
-//       ringB.current.rotation.x = Math.sin(t * 0.35) * 0.4;
-//     }
-//     if (ringC.current) {
-//       ringC.current.rotation.y = t * 0.2;
-//       ringC.current.rotation.x = Math.cos(t * 0.3) * 0.5;
-//     }
-//     if (core.current) {
-//       core.current.rotation.y = t * 0.1;
-//       core.current.rotation.x = t * 0.06;
-//     }
-//   });
-
-//   return (
-//     <group ref={group} scale={isMobile ? 1.1 : 1.55}>
-//       {/* Central glass icosahedron — big dramatic focal point */}
-//       <Icosahedron ref={core} args={[1.5, 0]} castShadow receiveShadow>
-//         <MeshTransmissionMaterial
-//           backside
-//           samples={isMobile ? 4 : 8}
-//           thickness={0.8}
-//           chromaticAberration={0.12}
-//           anisotropy={0.3}
-//           distortion={0.15}
-//           distortionScale={0.4}
-//           temporalDistortion={0.08}
-//           ior={1.44}
-//           color="#eaf4ff"
-//           attenuationColor="#7DF9FF"
-//           attenuationDistance={2}
-//           background={new THREE.Color('#06070A')}
-//         />
-//       </Icosahedron>
-
-//       {/* Wireframe ghost inside */}
-//       <Icosahedron args={[1.52, 1]}>
-//         <meshBasicMaterial color="#7DF9FF" wireframe transparent opacity={0.12} />
-//       </Icosahedron>
-
-//       {/* Concentric rings — thinner, more elegant */}
-//       <Torus ref={ringA} args={[2.4, 0.008, 16, 160]} rotation={[Math.PI / 2.4, 0, 0]}>
-//         <meshStandardMaterial
-//           color="#7DF9FF"
-//           emissive="#7DF9FF"
-//           emissiveIntensity={1.2}
-//           metalness={1}
-//           roughness={0.2}
-//         />
-//       </Torus>
-
-//       <Torus ref={ringB} args={[2.85, 0.006, 16, 200]} rotation={[0, 0, Math.PI / 3]}>
-//         <meshStandardMaterial
-//           color="#B69CFF"
-//           emissive="#B69CFF"
-//           emissiveIntensity={1}
-//           metalness={1}
-//           roughness={0.25}
-//         />
-//       </Torus>
-
-//       <Torus ref={ringC} args={[3.4, 0.004, 16, 220]}>
-//         <meshStandardMaterial
-//           color="#ffffff"
-//           emissive="#7DF9FF"
-//           emissiveIntensity={0.5}
-//           metalness={0.9}
-//           roughness={0.15}
-//           transparent
-//           opacity={0.6}
-//         />
-//       </Torus>
-
-//       {/* Accent dots */}
-//       <mesh position={[2.4, 0.5, 0]}>
-//         <sphereGeometry args={[0.055, 16, 16]} />
-//         <meshBasicMaterial color="#7DF9FF" />
-//       </mesh>
-//       <mesh position={[-2.85, -0.35, 0.5]}>
-//         <sphereGeometry args={[0.04, 16, 16]} />
-//         <meshBasicMaterial color="#B69CFF" />
-//       </mesh>
-//     </group>
-//   );
-// }
-
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import GlowPoints, { gauss, makeBuffers } from './GlowPoints';
 
-/* Spiral galaxy: thousands of coloured points on logarithmic arms */
-function Arms({ count }) {
-  const { positions, colors } = useMemo(() => {
-    const pos = new Float32Array(count * 3);
-    const col = new Float32Array(count * 3);
-    const core = new THREE.Color('#ffe2b8');
-    const mid = new THREE.Color('#B69CFF');
-    const rim = new THREE.Color('#8BE9FF');
-    const c = new THREE.Color();
-    const ARMS = 3, RADIUS = 4.2, SPIN = 1.35;
-    const jitter = () => Math.pow(Math.random(), 2.4) * (Math.random() < 0.5 ? 1 : -1);
+const R = 4.6;          // galaxy radius
+const ARMS = 2;         // two major arms, like the Milky Way
+const WIND = 0.78;      // how tightly the arms wind
 
-    for (let i = 0; i < count; i++) {
-      const r = Math.pow(Math.random(), 1.5) * RADIUS;
-      const angle = ((i % ARMS) / ARMS) * Math.PI * 2 + r * SPIN;
-      const spread = 0.12 + r * 0.16;
-      pos[i * 3]     = Math.cos(angle) * r + jitter() * spread * 2.2;
-      pos[i * 3 + 1] = jitter() * spread * 0.9;
-      pos[i * 3 + 2] = Math.sin(angle) * r + jitter() * spread * 2.2;
+const armAngle = (arm, r) => (arm / ARMS) * Math.PI * 2 + r * WIND;
+const C = (hex) => new THREE.Color(hex);
 
-      const t = r / RADIUS;
-      if (t < 0.5) c.copy(core).lerp(mid, t * 2);
-      else c.copy(mid).lerp(rim, (t - 0.5) * 2);
-      if (Math.random() < 0.06) c.set('#FF8AD8');      // rare pink nebula stars
-      col.set([c.r, c.g, c.b], i * 3);
+function buildGalaxy(count) {
+  const d = makeBuffers(count);
+  const warm = C('#ffcf8a'), cream = C('#fff1da'), yellow = C('#ffe0b0');
+  const blue = C('#9fc2ff'), pink = C('#ff6fb5'), ice = C('#cfe4ff');
+  const c = new THREE.Color();
+
+  for (let i = 0; i < count; i++) {
+    const roll = Math.random();
+    let x, y, z, size;
+
+    if (roll < 0.2) {
+      // central bulge: dense, warm, slightly flattened
+      const b = Math.abs(gauss()) * 0.42;
+      const th = Math.random() * Math.PI * 2;
+      const ph = Math.acos(2 * Math.random() - 1);
+      x = b * Math.sin(ph) * Math.cos(th);
+      y = b * Math.cos(ph) * 0.55;
+      z = b * Math.sin(ph) * Math.sin(th);
+      c.copy(warm).lerp(cream, Math.random());
+      size = 0.5 + Math.random() * 0.6;
+    } else {
+      const r = Math.min(-Math.log(1 - Math.random()) * 1.25 + 0.25, R);
+      const inArm = roll < 0.8;                       // 60% arms, 20% diffuse disc
+      const a = inArm
+        ? armAngle(Math.floor(Math.random() * ARMS), r) + gauss() * 0.26
+        : Math.random() * Math.PI * 2;
+      x = Math.cos(a) * r;
+      z = Math.sin(a) * r;
+      y = gauss() * 0.05 * (1 + r * 0.12);
+
+      const t = r / R;
+      c.copy(yellow).lerp(blue, Math.min(1, t * 1.25));
+      if (!inArm) c.multiplyScalar(0.5);
+      size = 0.35 + Math.random() * 0.55;
+
+      if (inArm) {
+        const s = Math.random();
+        if (s < 0.03) { c.copy(pink); size = 1.6 + Math.random() * 0.9; }         // star-forming regions
+        else if (s < 0.05) { c.copy(ice); size = 2.0 + Math.random() * 1.2; }     // young blue giants
+      }
     }
-    return { positions: pos, colors: col };
-  }, [count]);
-
-  return (
-    <points>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
-        <bufferAttribute attach="attributes-color" count={count} array={colors} itemSize={3} />
-      </bufferGeometry>
-      <pointsMaterial
-        size={0.032}
-        sizeAttenuation
-        vertexColors
-        transparent
-        opacity={0.95}
-        depthWrite={false}
-        blending={THREE.AdditiveBlending}
-      />
-    </points>
-  );
+    d.positions.set([x, y, z], i * 3);
+    d.colors.set([c.r, c.g, c.b], i * 3);
+    d.sizes[i] = size;
+  }
+  return d;
 }
 
-/* Glowing galactic core built from stacked additive spheres */
-function Core() {
+function makeGlowTexture() {
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = 128;
+  const ctx = cv.getContext('2d');
+  const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+  g.addColorStop(0, 'rgba(255,255,255,1)');
+  g.addColorStop(0.35, 'rgba(255,255,255,0.3)');
+  g.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, 128, 128);
+  return new THREE.CanvasTexture(cv);
+}
+
+/* Soft gas clouds along the arms + the core glow */
+function Nebulae({ isMobile }) {
+  const tex = useMemo(makeGlowTexture, []);
+  const clouds = useMemo(() => {
+    const palette = ['#ff5fa8', '#6fa8ff', '#9a6bff', '#ff8ad8'];
+    return Array.from({ length: isMobile ? 16 : 30 }, () => {
+      const r = 1.1 + Math.random() * 3.2;
+      const a = armAngle(Math.floor(Math.random() * ARMS), r) + gauss() * 0.14;
+      return {
+        pos: [Math.cos(a) * r, gauss() * 0.04, Math.sin(a) * r],
+        scale: 0.9 + Math.random() * 1.1,
+        color: palette[Math.floor(Math.random() * palette.length)],
+        opacity: 0.09 + Math.random() * 0.1,
+      };
+    });
+  }, [isMobile]);
+
+  const mat = (color, opacity) => (
+    <spriteMaterial map={tex} color={color} opacity={opacity} transparent depthWrite={false} blending={THREE.AdditiveBlending} />
+  );
+
   return (
     <group>
-      {[0.28, 0.5, 0.85, 1.4].map((r, i) => (
-        <mesh key={r}>
-          <sphereGeometry args={[r, 32, 32]} />
-          <meshBasicMaterial
-            color={i < 2 ? '#fff1d6' : '#B69CFF'}
-            transparent
-            opacity={[0.95, 0.35, 0.14, 0.06][i]}
-            depthWrite={false}
-            blending={THREE.AdditiveBlending}
-          />
-        </mesh>
+      {clouds.map((n, i) => (
+        <sprite key={i} position={n.pos} scale={[n.scale, n.scale, 1]}>{mat(n.color, n.opacity)}</sprite>
       ))}
-    </group>
-  );
-}
-
-/* A small ringed planet orbiting the galaxy */
-function Planet({ reduced }) {
-  const orbit = useRef();
-  const planet = useRef();
-  useFrame((s) => {
-    if (reduced) return;
-    const t = s.clock.getElapsedTime();
-    orbit.current.rotation.y = t * 0.22;
-    planet.current.rotation.y = t * 0.6;
-  });
-  return (
-    <group ref={orbit}>
-      <group position={[3.3, 0.35, 0]} ref={planet}>
-        <mesh>
-          <sphereGeometry args={[0.2, 48, 48]} />
-          <meshStandardMaterial color="#8BE9FF" roughness={0.35} metalness={0.25} emissive="#2b5cff" emissiveIntensity={0.35} />
-        </mesh>
-        <mesh rotation={[Math.PI / 2.3, 0, 0.3]}>
-          <ringGeometry args={[0.32, 0.5, 64]} />
-          <meshBasicMaterial color="#FF8AD8" side={THREE.DoubleSide} transparent opacity={0.6} />
-        </mesh>
-      </group>
+      <sprite scale={[2.4, 2.4, 1]}>{mat('#ffd9a0', 0.7)}</sprite>
+      <sprite scale={[6, 6, 1]}>{mat('#b69cff', 0.14)}</sprite>
     </group>
   );
 }
@@ -213,22 +106,21 @@ function Planet({ reduced }) {
 export default function Sculpture({ mouse, reduced = false, isMobile = false }) {
   const group = useRef();
   const spin = useRef();
+  const data = useMemo(() => buildGalaxy(isMobile ? 22000 : 65000), [isMobile]);
 
   useFrame((state, delta) => {
     if (!group.current) return;
-    const lerp = Math.min(1, delta * 2.5);
-    // mouse parallax on a fixed tilt
-    group.current.rotation.x += (0.95 + mouse.current.y * 0.25 - group.current.rotation.x) * lerp;
-    group.current.rotation.z += (0.18 + mouse.current.x * 0.12 - group.current.rotation.z) * lerp;
-    if (!reduced && spin.current) spin.current.rotation.y = state.clock.getElapsedTime() * 0.07;
+    const k = Math.min(1, delta * 2.5);
+    group.current.rotation.x += (1.05 + mouse.current.y * 0.2 - group.current.rotation.x) * k;
+    group.current.rotation.z += (0.25 + mouse.current.x * 0.12 - group.current.rotation.z) * k;
+    if (!reduced && spin.current) spin.current.rotation.y = state.clock.elapsedTime * 0.035;
   });
 
   return (
-    <group ref={group} scale={isMobile ? 0.8 : 1.15}>
+    <group ref={group} scale={isMobile ? 0.62 : 0.8}>
       <group ref={spin}>
-        <Arms count={isMobile ? 14000 : 32000} />
-        <Core />
-        <Planet reduced={reduced} />
+        <GlowPoints data={data} scale={22} twinkle={reduced ? 0 : 0.3} />
+        <Nebulae isMobile={isMobile} />
       </group>
     </group>
   );
